@@ -7,6 +7,7 @@
 ![Tests](https://img.shields.io/badge/tests-42%20lulus-brightgreen)
 ![Bahasa](https://img.shields.io/badge/UI-Bahasa%20Indonesia-C9A227)
 ![Standar](https://img.shields.io/badge/standar-ISAK%2035%20·%20PSAK%2072-3F2A68)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 Aplikasi pembukuan **multi-unit dengan konsolidasi** untuk Yayasan Tazkia Cendikia
 (unit: **Yayasan Pusat**, **STMIK Tazkia**, **Universitas Tazkia**). Dibangun dengan
