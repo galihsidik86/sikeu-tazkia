@@ -1,0 +1,23 @@
+{
+  "name": "sikeu-tazkia",
+  "version": "0.1.0",
+  "description": "SIKEU Tazkia — Sistem Informasi Keuangan & Akuntansi Yayasan Tazkia Cendikia (PostgreSQL)",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js",
+    "reset": "node src/db/migrate.js --fresh && node src/db/seed.js",
+    "test": "node --test --test-concurrency=1"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "pg": "^8.22.0"
+  }
+}

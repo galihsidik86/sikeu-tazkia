@@ -1,0 +1,17 @@
+node_modules/
+# Data lokal & database SQLite (jangan pernah di-commit)
+data/
+*.db
+*.db-shm
+*.db-wal
+# Backup database (SQLite maupun dump PostgreSQL)
+backups/
+*.sql.gz
+*.dump
+# Konfigurasi rahasia
+.env
+npm-debug.log*
+# Artefak dokumen brief (.dc.html) — bukan bagian aplikasi
+*.dc.html
+support.js
+.thumbnail
