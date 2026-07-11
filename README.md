@@ -1,5 +1,13 @@
 # SIKEU Tazkia — Sistem Informasi Keuangan & Akuntansi
 
+![Status](https://img.shields.io/badge/status-selesai%20(Fase%201–7)-2E1E4F)
+![Node.js](https://img.shields.io/badge/Node.js-≥18-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pg-4169E1?logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-42%20lulus-brightgreen)
+![Bahasa](https://img.shields.io/badge/UI-Bahasa%20Indonesia-C9A227)
+![Standar](https://img.shields.io/badge/standar-ISAK%2035%20·%20PSAK%2072-3F2A68)
+
 Aplikasi pembukuan **multi-unit dengan konsolidasi** untuk Yayasan Tazkia Cendikia
 (unit: **Yayasan Pusat**, **STMIK Tazkia**, **Universitas Tazkia**). Dibangun dengan
 Node.js + Express + **PostgreSQL** (driver `pg`), frontend HTML + vanilla JS, autentikasi
