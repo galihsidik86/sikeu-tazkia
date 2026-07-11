@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "\U0001F510 Masalah keamanan"
+    url: https://github.com/galihsidik86/sikeu-tazkia/security/advisories/new
+    about: Jangan buka Issue publik untuk kerentanan keamanan — laporkan secara privat.
+  - name: "\U0001F4AC Pertanyaan / diskusi"
+    url: https://github.com/galihsidik86/sikeu-tazkia/discussions
+    about: Untuk pertanyaan umum atau diskusi (bukan bug/fitur).
