@@ -304,3 +304,41 @@ tests/                    # critical(8)+kasbank(6)+piutang(8)+budget(7)+financia
 
 **Seluruh 6 fase selesai.** Aplikasi mencakup pembukuan double-entry multi-unit lengkap,
 kas & bank, piutang UKT (PSAK 72), anggaran RKAT, laporan keuangan ISAK 35, dan tutup buku.
+
+---
+
+## 7. Kontribusi
+
+Kontribusi dari tim internal Yayasan Tazkia Cendikia sangat diterima. Karena ini
+**sistem keuangan**, setiap perubahan yang menyentuh logika akuntansi wajib dijaga
+ketat (double-entry, imutabilitas jurnal terposting, penguncian periode, eliminasi
+antar-unit). Alur singkat:
+
+1. **Fork / branch** — buat branch fitur dari `main`, mis. `git checkout -b fitur/nama-singkat`.
+   Jangan commit langsung ke `main`.
+2. **Siapkan lingkungan** — `npm install`, salin `.env.example` → `.env`, siapkan PostgreSQL,
+   lalu `npm run reset` (migrate + seed data contoh). Lihat bagian **1. Menjalankan** di atas.
+3. **Tulis kode + uji** — setiap perubahan pada `src/services/*` yang menyentuh jurnal atau
+   saldo **harus disertai/di-cek dengan uji** di `tests/`. Nilai uang selalu integer **sen**
+   (`BIGINT`), jangan pernah pakai float untuk rupiah.
+4. **Jalankan seluruh uji** — `npm test` harus **hijau semua** sebelum push
+   (butuh database `sikeu_test`; lihat bagian menjalankan uji).
+5. **Commit** — pesan ringkas Bahasa Indonesia dengan prefiks jenis: `feat:`, `fix:`,
+   `docs:`, `refactor:`, `test:`, `chore:`. Satu tujuan per commit.
+6. **Pull Request** ke `main` — jelaskan **apa & mengapa**, dampak ke laporan keuangan
+   (bila ada), dan bukti `npm test` lulus. Minimal **1 reviewer** menyetujui sebelum merge.
+
+**Prinsip yang tidak boleh dilanggar:** jurnal berstatus `posted` bersifat **imutabel** —
+koreksi hanya lewat **jurnal balik (reversal)**, bukan edit/hapus. Periode yang sudah
+ditutup **tidak menerima posting**. Setiap baris jurnal **wajib** berdimensi unit.
+
+Pertanyaan atau usulan besar? Buka **Issue** lebih dulu untuk didiskusikan sebelum mengerjakan.
+
+---
+
+## 8. Lisensi
+
+Dirilis di bawah **[MIT License](LICENSE)** — © 2026 Yayasan Tazkia Cendikia.
+Bebas dipakai, disalin, dimodifikasi, dan didistribusikan dengan tetap menyertakan
+notis hak cipta dan lisensi. Perangkat lunak disediakan "sebagaimana adanya" tanpa
+jaminan apa pun.
