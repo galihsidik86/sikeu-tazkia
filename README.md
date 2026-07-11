@@ -313,7 +313,7 @@ kas & bank, piutang UKT (PSAK 72), anggaran RKAT, laporan keuangan ISAK 35, dan 
 Kontribusi dari tim internal Yayasan Tazkia Cendikia sangat diterima. Karena ini
 **sistem keuangan**, setiap perubahan yang menyentuh logika akuntansi wajib dijaga
 ketat (double-entry, imutabilitas jurnal terposting, penguncian periode, eliminasi
-antar-unit). Alur singkat:
+antar-unit). Panduan lengkap ada di **[CONTRIBUTING.md](CONTRIBUTING.md)**. Alur singkat:
 
 1. **Fork / branch** — buat branch fitur dari `main`, mis. `git checkout -b fitur/nama-singkat`.
    Jangan commit langsung ke `main`.
