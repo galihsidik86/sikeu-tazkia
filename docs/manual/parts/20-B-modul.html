@@ -1,0 +1,334 @@
+<h2 id="bagian-b">Bagian B — Prosedur Penggunaan per Modul</h2>
+<p class="lead">Bagian ini memandu tugas sehari-hari langkah demi langkah. Setiap prosedur
+mengikuti format seragam: <b>Tujuan → Pelaku → Prasyarat → Langkah → Hasil → Kesalahan
+umum</b>. Bagian ini dapat diikuti tanpa pendampingan, bahkan oleh pengguna baru.</p>
+
+<!-- ============================ B.1 MASTER DATA ============================ -->
+<h3 id="b1-master">B.1 Master Data</h3>
+<p>Master Data adalah data acuan yang dipakai seluruh modul: <b>Bagan Akun</b>, <b>Unit</b>,
+<b>Periode</b>, dan <b>Pengguna</b>. Menu ini umumnya dikelola Administrator/Staf Akuntansi.
+Buka melalui <i>Pengaturan → Master Data</i>, lalu pilih tab yang sesuai.</p>
+
+<h4 class="proc">Prosedur B.1.1 — Menambah akun pada Bagan Akun (COA)</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Menambah akun baru ke daftar akun.</div>
+  <div><span class="k">Pelaku</span>Admin / Staf Akuntansi.</div>
+  <div><span class="k">Prasyarat</span>Mengetahui kode, tipe, dan saldo normal akun.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Bagan Akun</b>. Daftar akun tampil berjenjang beserta saldo normal (D/K).</li>
+  <li>Klik <b>+ Tambah akun</b>.</li>
+  <li>Isi <b>kode</b>, <b>nama</b>, pilih <b>tipe</b> (aset, liabilitas, aset neto, pendapatan,
+    beban), <b>saldo normal</b>, dan induk akun bila ada.</li>
+  <li>Klik <b>Simpan</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/02-master-01-coa.png" alt="Bagan akun">
+  <div class="caption"><b>Gambar B1.1</b> — Bagan Akun (Chart of Accounts).</div></div>
+<div class="result"><b>Hasil:</b> Akun baru muncul di daftar dan siap dipakai pada jurnal
+(jika ditandai <i>dapat diposting</i>).</div>
+<div class="callout warn"><b>Kesalahan umum:</b> kode akun ganda ditolak. Akun "induk"
+(header) sebaiknya <i>tidak</i> dapat diposting — jadikan hanya akun paling rinci yang
+<i>dapat diposting</i>.</div>
+
+<h4 class="proc">Prosedur B.1.2 — Membuka atau mengunci periode</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mengizinkan/menghentikan posting pada suatu bulan.</div>
+  <div><span class="k">Pelaku</span>Admin / Bendahara / Pengurus.</div>
+  <div><span class="k">Prasyarat</span>Rekonsiliasi bulan tersebut selesai (untuk mengunci).</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Periode</b>. Setiap bulan menampilkan status <i>terbuka</i>/<i>terkunci</i>.</li>
+  <li>Klik tombol kunci/buka pada baris bulan yang dituju.</li>
+  <li>Konfirmasikan. Periode terkunci menolak jurnal baru bertanggal di dalamnya.</li>
+</ol>
+<div class="figure"><img src="../screenshots/02-master-03-periode.png" alt="Periode">
+  <div class="caption"><b>Gambar B1.2</b> — Pengelolaan periode akuntansi.</div></div>
+<div class="callout note">Unit, pengguna, dan penetapan peran dikelola di tab <b>Unit</b> dan
+<b>Pengguna</b> dengan pola yang sama (Tambah → isi → Simpan). Pada tab Pengguna,
+Administrator menetapkan email, peran, dan unit penempatan.</div>
+
+<!-- ============================ B.2 JURNAL UMUM ============================ -->
+<h3 id="b2-jurnal">B.2 Jurnal Umum</h3>
+<p>Jurnal Umum adalah inti pembukuan. Alur bakunya: <b>Draft → Ajukan → Setujui →
+Diposting</b>, dengan koreksi hanya melalui <b>jurnal balik</b>.</p>
+
+<h4 class="proc">Prosedur B.2.1 — Membuat dan mengajukan jurnal</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mencatat transaksi berpasangan yang seimbang.</div>
+  <div><span class="k">Pelaku</span>Staf Akuntansi / Kasir / Bendahara / Admin.</div>
+  <div><span class="k">Prasyarat</span>Periode terbuka; akun tersedia di COA.</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Jurnal Umum</b> → <b>+ Buat jurnal</b>.</li>
+  <li>Isi <b>tanggal</b>, <b>unit</b>, dan <b>deskripsi</b> transaksi.</li>
+  <li>Tambahkan baris: pilih <b>akun</b>, unit, lalu isi nominal pada kolom <b>Debit</b>
+    atau <b>Kredit</b>. Tambah baris sesuai kebutuhan.</li>
+  <li>Pastikan <b>total Debit = total Kredit</b> (indikator seimbang di bawah tabel).</li>
+  <li>Klik <b>Ajukan persetujuan</b>. Nomor jurnal otomatis diberikan saat diajukan.</li>
+</ol>
+<div class="figure"><img src="../screenshots/03-jurnal-02-form.png" alt="Form jurnal">
+  <div class="caption"><b>Gambar B2.1</b> — Formulir pembuatan jurnal.</div></div>
+<div class="result"><b>Hasil:</b> Jurnal berstatus <span class="badge b-pending">Menunggu</span>,
+menunggu persetujuan. Saldo <i>belum</i> berubah.</div>
+<div class="callout warn"><b>Kesalahan umum:</b> tombol Ajukan nonaktif berarti jurnal
+belum seimbang — periksa selisih Debit/Kredit. Menyimpan sebagai draft dulu juga
+diperbolehkan bila data belum lengkap.</div>
+
+<h4 class="proc">Prosedur B.2.2 — Menyetujui atau menolak (Bendahara)</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Memvalidasi lalu memposting jurnal.</div>
+  <div><span class="k">Pelaku</span>Bendahara / Pengurus / Admin.</div>
+  <div><span class="k">Prasyarat</span>Ada jurnal berstatus Menunggu.</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Jurnal Umum</b>, klik baris berstatus <span class="badge b-pending">Menunggu</span>.</li>
+  <li>Periksa akun dan nominal pada bukti jurnal.</li>
+  <li>Klik <b>Setujui &amp; posting</b> untuk memposting, atau <b>Tolak</b> disertai alasan.</li>
+</ol>
+<div class="figure"><img src="../screenshots/11-peran-02-bendahara-approval.png" alt="Approval bendahara">
+  <div class="caption"><b>Gambar B2.2</b> — Tampilan persetujuan: tombol <b>Setujui</b> (1) dan <b>Tolak</b> (2).</div></div>
+<div class="result"><b>Hasil:</b> Jurnal menjadi <span class="badge b-posted">Diposting</span>
+dan memengaruhi saldo. Jika ditolak, kembali dapat diperbaiki pembuatnya.</div>
+<div class="callout note">Bila jurnal beban melampaui pagu anggaran (RKAT), sistem
+memperingatkan. Penyetuju dapat tetap menyetujui dengan konfirmasi <i>melampaui pagu</i>
+(lihat B.5).</div>
+
+<h4 class="proc">Prosedur B.2.3 — Koreksi melalui jurnal balik &amp; cetak voucher</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mengoreksi jurnal terposting yang keliru.</div>
+  <div><span class="k">Pelaku</span>Bendahara / Pengurus / Admin.</div>
+  <div><span class="k">Prasyarat</span>Jurnal sudah Diposting; periode masih terbuka.</div>
+</div>
+<ol class="steps">
+  <li>Buka detail jurnal terposting yang keliru.</li>
+  <li>Klik <b>Buat jurnal balik</b>. Sistem membentuk jurnal kebalikannya dan mempostingnya.</li>
+  <li>Buat jurnal baru yang benar (Prosedur B.2.1).</li>
+  <li>Untuk arsip, klik <b>Cetak voucher</b> guna mencetak bukti jurnal yang rapi.</li>
+</ol>
+<div class="figure"><img src="../screenshots/03-jurnal-04-voucher.png" alt="Voucher jurnal" style="max-width:620px;display:block;margin:0 auto;">
+  <div class="caption"><b>Gambar B2.3</b> — Voucher jurnal siap cetak.</div></div>
+<div class="callout warn"><b>Kesalahan umum:</b> mencari tombol "Edit/Hapus" pada jurnal
+terposting — tidak ada, memang disengaja. Selalu gunakan jurnal balik.</div>
+
+<!-- ============================ B.3 KAS & BANK ============================ -->
+<h3 id="b3-kasbank">B.3 Kas &amp; Bank</h3>
+<p>Modul ini untuk mencatat penerimaan/pengeluaran kas dan merekonsiliasi mutasi bank.
+Kasir dapat mencatat kas <b>tanpa</b> memahami debit/kredit — cukup memilih <b>kategori</b>.</p>
+
+<h4 class="proc">Prosedur B.3.1 — Mencatat penerimaan kas (Kasir)</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mencatat uang masuk ke kas/bank.</div>
+  <div><span class="k">Pelaku</span>Kasir / Staf Akuntansi / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Rekening &amp; kategori sudah disiapkan admin.</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Kas &amp; Bank → Penerimaan kas</b>.</li>
+  <li>Pilih <b>rekening</b> tujuan, <b>tanggal</b>, dan <b>kategori</b> penerimaan
+    (mis. "Pendapatan pendaftaran").</li>
+  <li>Isi <b>jumlah</b> dan catatan, lalu <b>Simpan</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/11-peran-01-kasir-penerimaan.png" alt="Penerimaan kas">
+  <div class="caption"><b>Gambar B3.1</b> — Formulir penerimaan kas (tampilan Kasir).</div></div>
+<div class="result"><b>Hasil:</b> Sistem membentuk jurnal <b>berstatus Menunggu</b> untuk
+disetujui Bendahara. Kasir tidak perlu menentukan akun — kategori sudah memetakannya.</div>
+<div class="callout warn"><b>Kesalahan umum:</b> memilih kategori yang salah. Bila ragu,
+konsultasikan pemetaan kategori→akun ke Staf Akuntansi. Pengeluaran kas mengikuti
+langkah serupa pada tab <b>Pengeluaran kas</b>.</div>
+
+<h4 class="proc">Prosedur B.3.2 — Rekonsiliasi bank dari CSV mutasi</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mencocokkan catatan sistem dengan mutasi bank.</div>
+  <div><span class="k">Pelaku</span>Staf Akuntansi / Bendahara / Admin.</div>
+  <div><span class="k">Prasyarat</span>File CSV mutasi dari internet banking.</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Kas &amp; Bank → Rekonsiliasi bank</b>, pilih rekening.</li>
+  <li>Unggah <b>CSV</b> mutasi. Petakan kolom (tanggal, keterangan, debit/kredit) sesuai
+    format bank Anda.</li>
+  <li>Klik <b>Cocokkan otomatis</b> — sistem memasangkan mutasi dengan transaksi bernominal
+    sama dan tanggal ±3 hari.</li>
+  <li>Cocokkan sisanya secara manual; selesaikan selisih bila ada.</li>
+</ol>
+<div class="figure"><img src="../screenshots/04-kasbank-03-rekonsiliasi.png" alt="Rekonsiliasi bank">
+  <div class="caption"><b>Gambar B3.2</b> — Rekonsiliasi bank &amp; impor CSV.</div></div>
+<div class="callout warn"><b>Kesalahan umum:</b> impor gagal karena pemetaan kolom keliru
+atau format tanggal berbeda. Periksa kembali kolom mana yang berisi tanggal dan nominal.</div>
+
+<!-- ============================ B.4 PIUTANG UKT ============================ -->
+<h3 id="b4-piutang">B.4 Piutang Mahasiswa (UKT)</h3>
+<p>Mengelola tagihan UKT: data mahasiswa, penerbitan tagihan massal, pembayaran,
+umur piutang (aging) &amp; CKPN, serta pengakuan pendapatan bulanan.</p>
+
+<h4 class="proc">Prosedur B.4.1 — Menambah &amp; mengimpor mahasiswa</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mendata mahasiswa penerima tagihan.</div>
+  <div><span class="k">Pelaku</span>Admin / Staf Akuntansi.</div>
+  <div><span class="k">Prasyarat</span>Untuk impor: file CSV berisi kolom nim, nama, unit.</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Piutang UKT → Mahasiswa</b>.</li>
+  <li>Untuk satu mahasiswa: <b>+ Tambah mahasiswa</b>, isi data, <b>Simpan</b>.</li>
+  <li>Untuk banyak sekaligus: klik <b>Impor CSV</b>, unduh templat bila perlu, pilih berkas,
+    tinjau <b>pratinjau</b>, lalu <b>Simpan</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/05-piutang-03-impor.png" alt="Impor mahasiswa CSV">
+  <div class="caption"><b>Gambar B4.1</b> — Impor mahasiswa dari CSV dengan pratinjau.</div></div>
+<div class="result"><b>Hasil:</b> Ringkasan impor menampilkan jumlah <b>berhasil</b> dan
+<b>dilewati</b> (mis. NIM duplikat atau unit tak dikenal) beserta alasannya.</div>
+
+<h4 class="proc">Prosedur B.4.2 — Menerbitkan tagihan UKT massal</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Membuat tagihan satu semester untuk banyak mahasiswa.</div>
+  <div><span class="k">Pelaku</span>Admin / Staf Akuntansi / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Data mahasiswa sudah ada.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Generate tagihan massal</b>.</li>
+  <li>Isi <b>semester</b>, <b>nominal</b>, tanggal, jatuh tempo, dan tenor amortisasi.</li>
+  <li>Pilih mahasiswa sasaran (per unit/angkatan), lalu <b>Terbitkan</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/05-piutang-04-generate.png" alt="Generate tagihan">
+  <div class="caption"><b>Gambar B4.2</b> — Penerbitan tagihan UKT massal.</div></div>
+<div class="result"><b>Hasil:</b> Untuk tiap mahasiswa terbentuk jurnal
+<span class="mono">(D) Piutang UKT / (K) Pendapatan Diterima di Muka</span>. Mahasiswa yang
+sudah punya tagihan pada semester sama dilewati otomatis.</div>
+
+<h4 class="proc">Prosedur B.4.3 — Mencatat pembayaran (lunas atau cicilan)</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mencatat pembayaran UKT mahasiswa.</div>
+  <div><span class="k">Pelaku</span>Admin / Staf / Kasir / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Tagihan sudah terbit.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Daftar tagihan</b>. Cari tagihan mahasiswa.</li>
+  <li>Klik <b>Catat bayar</b> pada baris tagihan.</li>
+  <li>Isi <b>jumlah</b> (boleh sebagian untuk cicilan), rekening penerima, tanggal, metode.
+    Klik <b>Simpan</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/05-piutang-07-bayar.png" alt="Catat pembayaran" style="max-width:560px;display:block;margin:0 auto;">
+  <div class="caption"><b>Gambar B4.3</b> — Mencatat pembayaran/cicilan UKT.</div></div>
+<div class="callout warn"><b>Kesalahan umum:</b> mencatat pembayaran UKT lewat modul Kas
+(kategori umum) alih-alih di sini. <b>Selalu</b> catat pembayaran UKT melalui tombol
+<i>Catat bayar</i> agar buku besar Piutang tetap sinkron dengan rincian tagihan. (Lihat
+FAQ di D.4.)</div>
+
+<h4 class="proc">Prosedur B.4.4 — Membaca aging &amp; memproses CKPN</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Menilai umur piutang dan cadangan kerugian.</div>
+  <div><span class="k">Pelaku</span>Staf Akuntansi / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Ada piutang beredar.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Aging &amp; CKPN</b>. Piutang dikelompokkan per <b>bucket umur</b> dengan
+    tarif cadangan yang dapat dikonfigurasi.</li>
+  <li>Sesuaikan <b>tarif per bucket</b> bila kebijakan berubah.</li>
+  <li>Klik <b>Buat draft CKPN</b>. Sistem membuat jurnal penyesuaian
+    <span class="mono">(D) Beban CKPN / (K) CKPN</span> berstatus <b>draft</b> untuk ditinjau.</li>
+</ol>
+<div class="figure"><img src="../screenshots/05-piutang-05-aging-ckpn.png" alt="Aging & CKPN">
+  <div class="caption"><b>Gambar B4.4</b> — Umur piutang &amp; perhitungan CKPN.</div></div>
+
+<h4 class="proc">Prosedur B.4.5 — Menjalankan pengakuan pendapatan bulanan</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mengamortisasi pendapatan diterima di muka (PSAK 72).</div>
+  <div><span class="k">Pelaku</span>Admin / Staf / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Ada tagihan bertenor amortisasi.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Pengakuan pendapatan</b>, pilih <b>tahun</b> dan <b>bulan</b>.</li>
+  <li>Tinjau pratinjau jumlah yang akan diakui.</li>
+  <li>Klik <b>Jalankan</b>. Sistem memindahkan porsi bulan tersebut dari
+    <i>Pendapatan Diterima di Muka</i> ke <i>Pendapatan UKT</i>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/05-piutang-06-amortisasi.png" alt="Pengakuan pendapatan">
+  <div class="caption"><b>Gambar B4.5</b> — Pengakuan pendapatan bulanan (amortisasi).</div></div>
+<div class="callout note">Proses bulan yang sama tidak dapat dijalankan dua kali (dicegah
+sistem), sehingga aman diulang.</div>
+
+<!-- ============================ B.5 ANGGARAN RKAT ============================ -->
+<h3 id="b5-anggaran">B.5 Anggaran (RKAT)</h3>
+<p>RKAT menetapkan pagu belanja per unit dengan alur <b>Draft → Diajukan → Disahkan</b>.
+Setelah disahkan, pagu ditegakkan pada posting beban.</p>
+
+<h4 class="proc">Prosedur B.5.1 — Menyusun, mengajukan, mengesahkan RKAT</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Menetapkan anggaran belanja unit.</div>
+  <div><span class="k">Pelaku</span>Susun: Staf/Bendahara. Sahkan: Pengurus Yayasan.</div>
+  <div><span class="k">Prasyarat</span>Pilih satu unit (bukan konsolidasi).</div>
+</div>
+<ol class="steps">
+  <li>Buka <b>Anggaran (RKAT)</b>, pilih <b>unit</b> dan <b>tahun</b> di kanan atas.</li>
+  <li>Saat status <i>Draft</i>: isi pagu tiap pos beban, lalu <b>Ajukan RKAT</b>.</li>
+  <li>Pengurus Yayasan membuka halaman yang sama dan klik <b>Sahkan RKAT</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/07-anggaran-01-realisasi.png" alt="Realisasi anggaran">
+  <div class="caption"><b>Gambar B5.1</b> — Laporan realisasi vs anggaran (pagu, realisasi, sisa, %).</div></div>
+<div class="result"><b>Hasil:</b> Batang persentase menandai pos yang <b>waspada (≥80%)</b>
+dengan warna emas dan yang <b>melampaui pagu</b> dengan merah. Posting beban yang
+melampaui pagu RKAT yang telah disahkan akan diblokir (kecuali penyetuju meng-override).</div>
+
+<!-- ============================ B.6 LAPORAN KEUANGAN ============================ -->
+<h3 id="b6-laporan">B.6 Laporan Keuangan</h3>
+<p>SIKEU menyajikan empat laporan ISAK 35. Buka <b>Laporan Keuangan</b>, pilih jenis
+laporan, rentang tanggal, dan unit (atau <i>Konsolidasi</i>).</p>
+
+<h4 class="proc">Prosedur B.6.1 — Menghasilkan &amp; mengekspor laporan</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Menyajikan laporan keuangan resmi.</div>
+  <div><span class="k">Pelaku</span>Semua peran (lihat); umumnya Staf/Bendahara/Pengurus.</div>
+  <div><span class="k">Prasyarat</span>Jurnal periode terkait sudah diposting.</div>
+</div>
+<ol class="steps">
+  <li>Pilih jenis: <b>Posisi Keuangan</b>, <b>Penghasilan Komprehensif</b>,
+    <b>Perubahan Aset Neto</b>, atau <b>Arus Kas</b>.</li>
+  <li>Atur <b>periode</b> dan pilih <b>unit</b> atau <b>Konsolidasi — semua unit</b>.</li>
+  <li>Klik <b>Export PDF</b> (cetak) atau <b>Export Excel</b> sesuai kebutuhan.</li>
+</ol>
+<div class="figure"><img src="../screenshots/08-laporan-01-posisi.png" alt="Laporan posisi keuangan">
+  <div class="caption"><b>Gambar B6.1</b> — Laporan Posisi Keuangan (konsolidasi).</div></div>
+<div class="callout note">Pada mode konsolidasi, jika akun antar-unit belum nol sempurna,
+muncul <b>peringatan eliminasi</b> beserta selisihnya. Telusuri via Buku Besar akun
+antar-unit (lihat C.4).</div>
+
+<!-- ============================ B.7 DASHBOARD & AUDIT ============================ -->
+<h3 id="b7-dashboard">B.7 Dashboard dan Jejak Audit</h3>
+<p>Dashboard merangkum kondisi keuangan; Jejak Audit menelusuri setiap perubahan.</p>
+<h4>Membaca dashboard</h4>
+<p>Kartu atas menampilkan Total Aset, Kas &amp; Bank, Aset Neto, Surplus/Defisit YTD,
+Piutang Beredar (dengan CKPN), Serapan Anggaran, Mahasiswa Aktif, dan jumlah dokumen
+Menunggu Persetujuan. Di bawahnya: kinerja per unit, umur piutang, tren penerimaan 12
+bulan, dan status eliminasi antar-unit. Lihat <b>Gambar A.2</b>.</p>
+<h4>Menelusuri jejak audit</h4>
+<ol class="steps">
+  <li>Buka <b>Jejak Audit</b>.</li>
+  <li>Saring berdasarkan <b>entitas</b> atau <b>aksi</b>, atau ketik kata kunci lalu Enter.</li>
+  <li>Baca siapa melakukan apa dan kapan.</li>
+</ol>
+<div class="figure"><img src="../screenshots/10-admin-01-audit.png" alt="Jejak audit">
+  <div class="caption"><b>Gambar B7.1</b> — Jejak audit dengan penyaring &amp; pencarian.</div></div>
+
+<!-- ============================ B.8 RUTINITAS PERIODIK ============================ -->
+<h3 id="b8-rutinitas">B.8 Rutinitas Periodik (Checklist)</h3>
+<h4>Harian — Kasir</h4>
+<ul>
+  <li>Catat seluruh penerimaan &amp; pengeluaran kas hari itu (B.3.1).</li>
+  <li>Pastikan tidak ada transaksi tertunda di akhir hari.</li>
+  <li>Serahkan bukti fisik ke Bendahara untuk persetujuan.</li>
+</ul>
+<h4>Bulanan — Staf Akuntansi</h4>
+<ul>
+  <li>Rekonsiliasi seluruh rekening bank (B.3.2).</li>
+  <li>Jalankan pengakuan pendapatan UKT bulan berjalan (B.4.5).</li>
+  <li>Tinjau aging dan buat draft CKPN bila perlu (B.4.4).</li>
+  <li>Pastikan seluruh jurnal disetujui, lalu <b>kunci periode</b> (B.1.2).</li>
+  <li>Hasilkan laporan bulanan (B.6.1) untuk pimpinan.</li>
+</ul>
+<h4>Tahunan — Bendahara/Pengurus</h4>
+<ul>
+  <li>Pastikan seluruh periode tahun berjalan terkunci.</li>
+  <li>Jalankan <b>tutup buku tahunan</b> (memindahkan surplus/defisit ke aset neto) —
+    lihat C.8.</li>
+  <li>Pastikan <b>backup</b> terbaru tersedia (tab Backup Database).</li>
+</ul>
+<div class="figure"><img src="../screenshots/10-admin-02-tutup-buku.png" alt="Tutup buku">
+  <div class="caption"><b>Gambar B8.1</b> — Tutup buku tahunan (Administrasi).</div></div>

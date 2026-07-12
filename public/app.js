@@ -48,6 +48,25 @@ function toast(msg, kind = '') {
   setTimeout(() => el.remove(), 4200);
 }
 
+function openChangePassword() {
+  openModal('Ganti Kata Sandi', `
+    <div class="field"><label>Kata sandi lama <span class="req">*</span></label>
+      <input class="inp" type="password" id="cpOld" autocomplete="current-password"></div>
+    <div class="field" style="margin-top:12px;"><label>Kata sandi baru <span class="req">*</span></label>
+      <input class="inp" type="password" id="cpNew" autocomplete="new-password" placeholder="Minimal 8 karakter"></div>
+    <div class="field" style="margin-top:12px;"><label>Ulangi kata sandi baru <span class="req">*</span></label>
+      <input class="inp" type="password" id="cpNew2" autocomplete="new-password"></div>
+    <div class="note" style="margin-top:10px;">Setelah diganti, gunakan kata sandi baru pada login berikutnya.</div>`,
+    async () => {
+      const old_password = $('#cpOld').value, new_password = $('#cpNew').value, confirm2 = $('#cpNew2').value;
+      if (!old_password || !new_password) throw new Error('Lengkapi semua kolom.');
+      if (new_password.length < 8) throw new Error('Kata sandi baru minimal 8 karakter.');
+      if (new_password !== confirm2) throw new Error('Konfirmasi kata sandi baru tidak cocok.');
+      await api.post('/api/auth/change-password', { old_password, new_password });
+      toast('Kata sandi berhasil diganti.', 'ok');
+    });
+}
+
 // ---------------- State ----------------
 const state = { user: null, units: [], unit: 'all', accounts: [] };
 const perms = {};
@@ -143,6 +162,7 @@ function renderShell() {
             ${iconBuilding()}
             <select id="unitSel">${unitOpts}</select>
           </div>
+          <button class="btn sm" id="pwdBtn">Ganti Sandi</button>
           <button class="btn sm" id="logoutBtn">Keluar</button>
         </div>
       </header>
@@ -153,6 +173,7 @@ function renderShell() {
   $('#unitSel').value = state.unit;
   $('#unitSel').addEventListener('change', e => { state.unit = e.target.value; route(); });
   $('#logoutBtn').addEventListener('click', async () => { await api.post('/api/auth/logout'); location.href = '/login'; });
+  $('#pwdBtn').addEventListener('click', openChangePassword);
   $('#app').querySelectorAll('[data-nav]').forEach(el =>
     el.addEventListener('click', () => { location.hash = '#/' + el.dataset.nav; }));
 }
@@ -451,6 +472,7 @@ async function viewJurnalDetail(id) {
   } else if (j.status === 'posted') {
     if (perms.approve) actions.push(`<button class="btn gold" id="aReverse">Buat jurnal balik</button>`);
   }
+  if (j.nomor) actions.unshift(`<button class="btn outline" id="aVoucher">Cetak voucher</button>`);
 
   const linkInfo = [];
   if (j.reversal_of_nomor) linkInfo.push(`Jurnal pembalik atas <b class="mono">${esc(j.reversal_of_nomor)}</b>`);
@@ -502,6 +524,59 @@ async function viewJurnalDetail(id) {
   });
   bind('#aReject', async () => { const alasan = prompt('Alasan penolakan:'); if (alasan === null) return; try { await api.post('/api/journals/' + id + '/reject', { alasan }); toast('Jurnal ditolak.', 'ok'); viewJurnalDetail(id); } catch (e) { toast(e.message, 'err'); } });
   bind('#aReverse', async () => { if (!confirm('Buat jurnal balik (reversal) untuk jurnal terposting ini?')) return; try { const r = await api.post('/api/journals/' + id + '/reverse'); toast('Jurnal balik dibuat & diposting.', 'ok'); location.hash = '#/jurnal/' + r.id; } catch (e) { toast(e.message, 'err'); } });
+  bind('#aVoucher', () => printVoucher(j));
+}
+
+function printVoucher(j) {
+  const rows = j.lines.map(l => `<tr>
+    <td><span class="k">${esc(l.akun_kode)}</span> ${esc(l.akun_nama)}</td>
+    <td class="c">${esc(l.unit_kode)}</td>
+    <td class="r">${l.debit ? fmtNum(l.debit) : ''}</td>
+    <td class="r">${l.kredit ? fmtNum(l.kredit) : ''}</td></tr>`).join('');
+  const approver = (j.history || []).find(h => h.action === 'approve' || h.action === 'post');
+  const html = `<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Voucher ${esc(j.nomor || '')}</title>
+    <style>
+      *{box-sizing:border-box;} body{font-family:'Segoe UI',Arial,sans-serif;color:#1c1626;margin:0;padding:32px;font-size:12px;}
+      .sheet{max-width:720px;margin:0 auto;}
+      .head{text-align:center;border-bottom:2.5px solid #3F2A68;padding-bottom:12px;}
+      .yys{font-size:10px;font-weight:800;letter-spacing:.18em;color:#6b647a;}
+      .ttl{font-size:20px;font-weight:800;color:#2E1E4F;margin-top:4px;}
+      .no{font-family:'Consolas',monospace;font-weight:700;color:#3F2A68;margin-top:3px;}
+      .meta{display:flex;gap:24px;margin-top:16px;}
+      .meta div .lab{font-size:9px;font-weight:800;letter-spacing:.08em;color:#8a8397;}
+      .meta div .val{font-weight:700;margin-top:2px;}
+      .desc{margin-top:12px;} .desc .lab{font-size:9px;font-weight:800;letter-spacing:.08em;color:#8a8397;}
+      table{width:100%;border-collapse:collapse;margin-top:16px;}
+      th{background:#f4f3f8;font-size:9px;letter-spacing:.06em;text-align:left;padding:8px 10px;border-bottom:1.5px solid #d9d5e4;}
+      th.r,td.r{text-align:right;} th.c,td.c{text-align:center;}
+      td{padding:7px 10px;border-bottom:1px solid #eeecf3;} td .k{font-family:'Consolas',monospace;color:#3F2A68;font-weight:700;}
+      tfoot td{font-weight:800;border-top:1.5px solid #3F2A68;border-bottom:none;background:#faf9fc;}
+      .sign{display:flex;justify-content:space-between;margin-top:48px;text-align:center;}
+      .sign div{width:40%;} .sign .line{margin-top:56px;border-top:1px solid #1c1626;padding-top:5px;font-weight:700;}
+      .foot{margin-top:32px;font-size:9px;color:#a49db2;text-align:center;}
+      @media print{body{padding:0;}}
+    </style></head><body onload="window.print()">
+    <div class="sheet">
+      <div class="head"><div class="yys">YAYASAN TAZKIA CENDIKIA</div>
+        <div class="ttl">Bukti Jurnal Umum</div><div class="no">${esc(j.nomor || '')}</div></div>
+      <div class="meta">
+        <div><div class="lab">TANGGAL</div><div class="val">${fmtDate(j.tanggal)}</div></div>
+        <div><div class="lab">UNIT</div><div class="val">${esc(j.unit_nama)}</div></div>
+        <div><div class="lab">STATUS</div><div class="val">${(STATUS[j.status] || j.status)}</div></div>
+      </div>
+      <div class="desc"><div class="lab">DESKRIPSI</div><div class="val">${esc(j.deskripsi)}</div></div>
+      <table><thead><tr><th>AKUN</th><th class="c">UNIT</th><th class="r">DEBIT (Rp)</th><th class="r">KREDIT (Rp)</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td>TOTAL</td><td></td><td class="r">${fmtNum(j.totalDebit)}</td><td class="r">${fmtNum(j.totalKredit)}</td></tr></tfoot></table>
+      <div class="sign">
+        <div><div>Dibuat oleh,</div><div class="line">${esc(j.created_by_nama || '(………………)')}</div></div>
+        <div><div>Disetujui oleh,</div><div class="line">${esc(approver ? approver.user_nama : '(………………)')}</div></div>
+      </div>
+      <div class="foot">Dicetak dari SIKEU Tazkia · ${fmtDate(new Date().toISOString())}</div>
+    </div></body></html>`;
+  const w = window.open('', '_blank', 'width=820,height=920');
+  if (!w) { toast('Popup diblokir. Izinkan popup untuk mencetak voucher.', 'err'); return; }
+  w.document.write(html); w.document.close();
 }
 function actLabel(a) {
   return { create: 'Draft dibuat', update: 'Draft diubah', submit: 'Diajukan untuk persetujuan',
@@ -874,7 +949,8 @@ async function piMahasiswa() {
   $('#piOut').innerHTML = `
     <div style="display:flex;gap:10px;align-items:center;margin:14px 0;flex-wrap:wrap;">
       <input class="inp" id="stuSearch" placeholder="Cari NIM atau nama…" style="max-width:280px;">
-      ${perms.studentMaster ? `<button class="btn primary sm" id="addStu" style="margin-left:auto;">+ Tambah mahasiswa</button>` : ''}
+      ${perms.studentMaster ? `<button class="btn outline sm" id="impStu" style="margin-left:auto;">Impor CSV</button>
+      <button class="btn primary sm" id="addStu">+ Tambah mahasiswa</button>` : ''}
     </div>
     <div class="card tbl-wrap"><table class="tbl"><thead><tr><th>NIM</th><th>NAMA</th><th>PRODI</th><th>UNIT</th><th>ANGKATAN</th><th>STATUS</th></tr></thead><tbody id="stuBody"></tbody></table></div>`;
   $('#stuSearch').addEventListener('input', e => load(e.target.value.trim()));
@@ -892,7 +968,72 @@ async function piMahasiswa() {
       toast('Mahasiswa ditambahkan.', 'ok'); piMahasiswa();
     });
   });
+  const imp = $('#impStu'); if (imp) imp.addEventListener('click', openImportStudents);
   load();
+}
+
+// Parser CSV sederhana (delimiter , atau ; ; baris pertama = header)
+function parseCsv(text) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim() !== '');
+  if (!lines.length) return { headers: [], rows: [] };
+  const delim = (lines[0].match(/;/g) || []).length > (lines[0].match(/,/g) || []).length ? ';' : ',';
+  const split = (line) => {
+    const out = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) { if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+      else if (c === '"') q = true; else if (c === delim) { out.push(cur); cur = ''; } else cur += c;
+    }
+    out.push(cur); return out.map(s => s.trim());
+  };
+  const headers = split(lines[0]).map(h => h.toLowerCase());
+  const rows = lines.slice(1).map(split);
+  return { headers, rows };
+}
+
+function openImportStudents() {
+  let parsed = [];
+  openModal('Impor Mahasiswa dari CSV', `
+    <div class="note" style="margin-bottom:10px;">Format kolom (baris pertama = judul): <b>nim, nama, prodi, unit, angkatan</b>.
+      Kolom <b>unit</b> memakai kode <span class="mono">YYS</span>/<span class="mono">STM</span>/<span class="mono">UNV</span>.</div>
+    <div style="margin-bottom:10px;"><a href="#" id="dlTemplate" style="color:var(--primary);font-weight:700;font-size:12.5px;">↓ Unduh templat CSV</a></div>
+    <div class="field"><label>Berkas CSV</label><input class="inp" type="file" id="impFile" accept=".csv,text/csv"></div>
+    <div id="impPrev" style="margin-top:12px;"></div>`,
+    async () => {
+      if (!parsed.length) throw new Error('Pilih berkas CSV yang valid dahulu.');
+      const r = await api.post('/api/piutang/students/import', { students: parsed });
+      let msg = `${r.inserted} mahasiswa diimpor`;
+      if (r.skipped) msg += `, ${r.skipped} dilewati`;
+      toast(msg + '.', r.skipped ? '' : 'ok');
+      piMahasiswa();
+    });
+  $('#dlTemplate').addEventListener('click', (e) => {
+    e.preventDefault();
+    const tpl = 'nim,nama,prodi,unit,angkatan\n2301010,Nama Mahasiswa,Teknik Informatika,STM,2023\n';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([tpl], { type: 'text/csv' }));
+    a.download = 'templat-mahasiswa.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  $('#impFile').addEventListener('change', (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const { headers, rows } = parseCsv(String(reader.result));
+      const idx = (names) => headers.findIndex(hh => names.includes(hh));
+      const iNim = idx(['nim']), iNama = idx(['nama', 'name']), iProdi = idx(['prodi', 'program studi', 'jurusan']),
+        iUnit = idx(['unit', 'kode unit', 'kampus']), iAng = idx(['angkatan', 'tahun']);
+      if (iNim < 0 || iNama < 0 || iUnit < 0) {
+        parsed = []; $('#impPrev').innerHTML = `<div class="err-box">Kolom wajib tidak lengkap. Butuh minimal: nim, nama, unit.</div>`; return;
+      }
+      parsed = rows.map(c => ({ nim: c[iNim], nama: c[iNama], prodi: iProdi >= 0 ? c[iProdi] : '', unit: c[iUnit], angkatan: iAng >= 0 ? c[iAng] : '' }))
+        .filter(r => (r.nim || r.nama));
+      const head = '<tr><th>NIM</th><th>NAMA</th><th>PRODI</th><th>UNIT</th><th>ANGK.</th></tr>';
+      const body = parsed.slice(0, 8).map(r => `<tr><td class="mono">${esc(r.nim)}</td><td>${esc(r.nama)}</td><td class="note">${esc(r.prodi)}</td><td>${esc(r.unit)}</td><td>${esc(r.angkatan)}</td></tr>`).join('');
+      $('#impPrev').innerHTML = `<div class="ok-box" style="margin-bottom:8px;">${parsed.length} baris terbaca. Pratinjau ${Math.min(8, parsed.length)} baris pertama:</div>
+        <div class="card tbl-wrap" style="box-shadow:none;"><table class="tbl">${head}${body}</table></div>`;
+    };
+    reader.readAsText(f);
+  });
 }
 
 async function piGenerate() {

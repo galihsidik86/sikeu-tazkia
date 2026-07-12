@@ -22,6 +22,7 @@ async function unitIdFromKode(kode) {
 router.get('/students', h(async (req) => svc.listStudents(await unitIdFromKode(req.query.unit), req.query.q)));
 router.post('/students', canStudentMaster, h((req) => svc.createStudent(withIp(req), req.body || {})));
 router.put('/students/:id', canStudentMaster, h((req) => svc.updateStudent(withIp(req), +req.params.id, req.body || {})));
+router.post('/students/import', canStudentMaster, h((req) => svc.importStudents(withIp(req), req.body || {})));
 
 // ---- Tagihan ----
 router.get('/invoices', h(async (req) => svc.listInvoices({

@@ -75,6 +75,47 @@ async function updateStudent(user, id, b) {
   return db.prepare('SELECT * FROM students WHERE id=?').get(id);
 }
 
+async function importStudents(user, b) {
+  const rows = Array.isArray(b.students) ? b.students : null;
+  if (!rows || !rows.length) throw new ApiError(400, 'Tidak ada baris untuk diimpor.');
+  if (rows.length > 2000) throw new ApiError(400, 'Maksimum 2000 baris per impor.');
+  // Peta unit: kode (STM) atau nama → id
+  const units = await db.prepare('SELECT id, kode, nama FROM units').all();
+  const unitBy = {};
+  for (const u of units) { unitBy[u.kode.toLowerCase()] = u.id; unitBy[u.nama.toLowerCase()] = u.id; }
+
+  const result = { total: rows.length, inserted: 0, skipped: 0, errors: [] };
+  // Best-effort: setiap baris di-insert autocommit sendiri (bukan satu transaksi),
+  // agar satu baris gagal (mis. NIM duplikat) tidak membatalkan baris lain — di Postgres,
+  // satu error dalam transaksi akan menggagalkan seluruh statement berikutnya.
+  const seen = new Set();
+  {
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i] || {};
+      const baris = i + 1;
+      const nim = String(r.nim || '').trim();
+      const nama = String(r.nama || '').trim();
+      const unitKey = String(r.unit || '').trim().toLowerCase();
+      const unit_id = unitBy[unitKey];
+      if (!nim || !nama || !unitKey) { result.skipped++; result.errors.push({ baris, nim, pesan: 'NIM, nama, dan unit wajib diisi.' }); continue; }
+      if (!unit_id) { result.skipped++; result.errors.push({ baris, nim, pesan: `Unit "${r.unit}" tidak dikenal (pakai kode YYS/STM/UNV).` }); continue; }
+      if (seen.has(nim)) { result.skipped++; result.errors.push({ baris, nim, pesan: 'NIM duplikat di dalam berkas.' }); continue; }
+      seen.add(nim);
+      const angkatan = r.angkatan ? parseInt(r.angkatan, 10) : null;
+      try {
+        await db.prepare('INSERT INTO students (nim,nama,prodi,unit_id,angkatan,status) VALUES (?,?,?,?,?,?)')
+          .run(nim, nama, String(r.prodi || '').trim() || null, unit_id, Number.isFinite(angkatan) ? angkatan : null, 'aktif');
+        result.inserted++;
+      } catch (e) {
+        result.skipped++;
+        result.errors.push({ baris, nim, pesan: isDup(e) ? 'NIM sudah terdaftar.' : (e.message || 'Gagal.') });
+      }
+    }
+  }
+  await audit.log(user, 'import', 'student', null, { total: result.total, inserted: result.inserted, skipped: result.skipped }, user.ip);
+  return result;
+}
+
 // ---------- Tagihan ----------
 async function paidOf(invoiceId) {
   return (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM payments WHERE invoice_id=?').get(invoiceId)).s;
@@ -328,7 +369,7 @@ const runAmortisasi = db.transaction(async (user, tahun, bulan) => {
 
 module.exports = {
   CKPN_BUCKETS, listCkpnRates, updateCkpnRate,
-  listStudents, createStudent, updateStudent,
+  listStudents, createStudent, updateStudent, importStudents,
   listInvoices, getInvoice, createInvoice, generateInvoices,
   recordPayment, aging, ckpnBalance, runCkpn,
   amortisasiPreview, runAmortisasi,

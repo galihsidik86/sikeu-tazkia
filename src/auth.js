@@ -35,6 +35,21 @@ async function getUser(id) {
   return u && u.aktif ? sanitize(u) : null;
 }
 
+async function changePassword(userId, oldPass, newPass) {
+  const u = await findById.get(userId);
+  if (!u) { const e = new Error('Pengguna tidak ditemukan.'); e.status = 404; throw e; }
+  if (!verifyPassword(String(oldPass || ''), u.password_hash)) {
+    const e = new Error('Kata sandi lama salah.'); e.status = 400; throw e;
+  }
+  const np = String(newPass || '');
+  if (np.length < 8) { const e = new Error('Kata sandi baru minimal 8 karakter.'); e.status = 400; throw e; }
+  if (verifyPassword(np, u.password_hash)) {
+    const e = new Error('Kata sandi baru harus berbeda dari kata sandi lama.'); e.status = 400; throw e;
+  }
+  await db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(np), userId);
+  return true;
+}
+
 function sanitize(u) {
   return {
     id: u.id, nama: u.nama, email: u.email, role: u.role,
@@ -71,6 +86,6 @@ function requireRole(...roles) {
 
 module.exports = {
   ROLES, APPROVER_ROLES, AUTHOR_ROLES, MASTER_ROLES, PERIOD_ROLES,
-  hashPassword, verifyPassword, authenticate, getUser, sanitize,
+  hashPassword, verifyPassword, authenticate, changePassword, getUser, sanitize,
   requireAuth, requireRole,
 };

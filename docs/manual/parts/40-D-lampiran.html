@@ -1,0 +1,140 @@
+<h2 id="bagian-d">Bagian D — Lampiran</h2>
+
+<h3 id="d1-coa">D.1 Bagan Akun Lengkap</h3>
+<p>Daftar seluruh akun (Chart of Accounts) yang aktif di sistem. Tabel ini
+<b>digenerate otomatis dari basis data</b> sehingga selalu mencerminkan kondisi terbaru.</p>
+<!--BAGAN_AKUN-->
+
+<h3 id="d2-matriks">D.2 Matriks Peran &amp; Kewenangan</h3>
+<p>Rangkuman kewenangan tiap peran, digenerate dari konfigurasi sistem.</p>
+<!--MATRIKS_PERAN-->
+
+<h3 id="d3-glosarium">D.3 Glosarium</h3>
+<dl class="dl">
+  <dt>Aset neto</dt><dd>Kekayaan bersih entitas nirlaba (setara "ekuitas"), dipilah menjadi
+    <i>tanpa pembatasan</i> dan <i>dengan pembatasan</i> dari pemberi dana.</dd>
+  <dt>Double-entry (berpasangan)</dt><dd>Prinsip bahwa setiap transaksi dicatat pada dua sisi
+    (debit dan kredit) dengan jumlah sama.</dd>
+  <dt>Saldo normal</dt><dd>Sisi (Debit/Kredit) tempat suatu akun bertambah. Aset &amp; beban
+    normal Debit; liabilitas, aset neto, &amp; pendapatan normal Kredit.</dd>
+  <dt>Jurnal balik (reversal)</dt><dd>Jurnal kebalikan untuk menetralkan jurnal terposting
+    yang keliru — cara satu-satunya mengoreksi tanpa mengubah riwayat.</dd>
+  <dt>Periode terkunci</dt><dd>Bulan pembukuan yang telah ditutup dan tidak menerima jurnal
+    baru.</dd>
+  <dt>Konsolidasi</dt><dd>Penggabungan laporan seluruh unit menjadi satu, setelah transaksi
+    antar-unit dieliminasi.</dd>
+  <dt>Eliminasi antar-unit</dt><dd>Penghapusan saldo yang timbul dari transaksi antar-unit
+    (mis. Piutang vs Utang Antar-Unit) agar tidak dihitung ganda saat konsolidasi.</dd>
+  <dt>Pendapatan diterima di muka</dt><dd>Kas/tagihan yang diterima untuk jasa yang belum
+    diberikan (mis. UKT satu semester); liabilitas yang diakui menjadi pendapatan bertahap.</dd>
+  <dt>Amortisasi pendapatan</dt><dd>Pengakuan pendapatan secara bertahap selama masa manfaat
+    (PSAK 72).</dd>
+  <dt>Aging (umur piutang)</dt><dd>Pengelompokan piutang menurut lama tunggakan sejak jatuh
+    tempo.</dd>
+  <dt>CKPN</dt><dd>Cadangan Kerugian Penurunan Nilai — estimasi piutang tak tertagih
+    (PSAK 71), disajikan sebagai kontra-aset.</dd>
+  <dt>Kontra-akun</dt><dd>Akun yang mengurangi akun lain (mis. Akumulasi Penyusutan mengurangi
+    Aset Tetap; CKPN mengurangi Piutang).</dd>
+  <dt>RKAT</dt><dd>Rencana Kegiatan dan Anggaran Tahunan — pagu belanja per unit.</dd>
+  <dt>Pagu</dt><dd>Batas anggaran suatu pos belanja.</dd>
+  <dt>ISAK 35</dt><dd>Standar penyajian laporan keuangan entitas berorientasi nonlaba.</dd>
+</dl>
+
+<h3 id="d4-faq">D.4 FAQ &amp; Pemecahan Masalah</h3>
+
+<div class="faq"><div class="q">Saya lupa kata sandi. Bagaimana?</div>
+<div class="a">Belum ada pemulihan sandi mandiri. Hubungi Administrator untuk menyetel ulang
+kata sandi akun Anda, lalu ganti sendiri via <b>Ganti Sandi</b> (A.3).</div></div>
+
+<div class="faq"><div class="q">Tombol "Ajukan" nonaktif — jurnal tidak bisa diajukan.</div>
+<div class="a">Jurnal belum seimbang. Pastikan <b>total Debit = total Kredit</b>. Periksa baris
+yang nominalnya salah kolom atau kosong.</div></div>
+
+<div class="faq"><div class="q">Saya salah memilih unit, tetapi jurnal sudah diposting.</div>
+<div class="a">Jurnal terposting tidak dapat diedit. Buat <b>jurnal balik</b> (B.2.3) untuk
+menetralkannya, lalu buat jurnal baru dengan unit yang benar.</div></div>
+
+<div class="faq"><div class="q">Impor mahasiswa CSV gagal atau banyak baris dilewati.</div>
+<div class="a">Periksa ringkasan impor: penyebab umum adalah <b>NIM duplikat</b>, <b>kolom unit
+tak dikenal</b> (gunakan kode YYS/STM/UNV), atau kolom wajib kosong. Unduh templat CSV dari
+dialog impor sebagai acuan.</div></div>
+
+<div class="faq"><div class="q">Laporan konsolidasi menampilkan peringatan eliminasi.</div>
+<div class="a">Saldo akun antar-unit belum nol — biasanya karena pasangan jurnal di salah satu
+unit belum dibuat/diposting. Telusuri <b>Buku Besar</b> akun 1140/2150 untuk menemukan
+selisihnya (lihat C.4).</div></div>
+
+<div class="faq"><div class="q">Angka dashboard tidak sama dengan laporan keuangan.</div>
+<div class="a">Dashboard menampilkan posisi <b>tahun berjalan</b> per hari ini, sedangkan laporan
+mengikuti <b>rentang tanggal</b> yang Anda pilih. Samakan periode, dan pastikan tidak ada
+jurnal yang masih berstatus Draft/Menunggu (belum memengaruhi saldo).</div></div>
+
+<div class="faq"><div class="q">Saya tidak bisa memposting ke bulan lalu.</div>
+<div class="a">Periode tersebut kemungkinan sudah <b>terkunci</b>. Minta peran berwenang membuka
+periode (B.1.2), atau catat transaksi pada periode berjalan bila sesuai kebijakan.</div></div>
+
+<div class="faq"><div class="q">Pembayaran UKT tidak mengurangi piutang di laporan aging.</div>
+<div class="a">Pembayaran UKT harus dicatat lewat <b>Catat bayar</b> di modul Piutang (B.4.3),
+bukan sebagai penerimaan kas umum. Bila terlanjur lewat Kas, buku besar Piutang akan
+berbeda dari rincian tagihan — koreksi dengan jurnal balik lalu catat ulang di modul
+Piutang.</div></div>
+
+<div class="faq"><div class="q">Tombol "Setujui" tidak muncul di jurnal.</div>
+<div class="a">Persetujuan hanya tersedia bagi peran penyetuju (Bendahara/Pengurus/Admin) dan
+hanya untuk jurnal berstatus <b>Menunggu</b>. Jurnal Draft harus <b>diajukan</b> dulu.</div></div>
+
+<div class="faq"><div class="q">Beberapa menu tidak tampil di sisi saya.</div>
+<div class="a">Menu menyesuaikan peran (lihat matriks D.2). Jika Anda memerlukan akses tambahan,
+hubungi Administrator.</div></div>
+
+<div class="faq"><div class="q">Posting beban ditolak karena melampaui pagu.</div>
+<div class="a">Pos beban telah melewati anggaran RKAT yang disahkan. Penyetuju dapat
+meng-<b>override</b> dengan konfirmasi, atau anggaran direvisi lebih dulu (B.5).</div></div>
+
+<div class="faq"><div class="q">Angka CKPN belum muncul di laporan.</div>
+<div class="a">Jurnal CKPN yang baru dibuat berstatus <b>draft</b>. Ia baru memengaruhi laporan
+setelah diajukan dan disetujui (diposting).</div></div>
+
+<div class="faq"><div class="q">Pendapatan UKT tidak bertambah padahal sudah ada tagihan.</div>
+<div class="a">UKT diakui bertahap. Jalankan <b>Pengakuan pendapatan</b> bulanan (B.4.5) agar
+porsi bulan itu berpindah dari Pendapatan Diterima di Muka ke Pendapatan UKT.</div></div>
+
+<div class="faq"><div class="q">Bagaimana membatalkan tutup buku?</div>
+<div class="a">Pada <i>Administrasi → Tutup Buku Tahunan</i>, gunakan <b>Batalkan tutup buku</b>.
+Sistem membalik jurnal penutup dan membuka kembali periode. Tindakan tercatat di audit.</div></div>
+
+<div class="faq"><div class="q">Voucher tidak bisa dicetak / jendela tidak muncul.</div>
+<div class="a">Voucher terbuka di jendela baru. Bila peramban memblokir <i>pop-up</i>, izinkan
+pop-up untuk situs SIKEU lalu klik <b>Cetak voucher</b> lagi.</div></div>
+
+<div class="faq"><div class="q">Di mana letak backup, dan bagaimana memulihkannya?</div>
+<div class="a">Backup otomatis (harian dan saat sistem start) tersimpan di folder <span class="mono">data/backups</span>
+di server, disimpan hingga 30 hari. Pemulihan dilakukan Administrator di server. Buat
+backup manual kapan saja di <i>Administrasi → Backup Database</i>.</div></div>
+
+<div class="faq"><div class="q">File Excel hasil ekspor tampil berantakan.</div>
+<div class="a">Berkas berformat spreadsheet HTML. Buka dengan Excel/LibreOffice (bukan editor
+teks). Bila muncul peringatan format, pilih tetap buka.</div></div>
+
+<h3 id="d5-future">D.5 Pengembangan Selanjutnya</h3>
+<p>Fitur berikut <b>belum</b> tersedia dan direncanakan pada pengembangan berikutnya:</p>
+<ul>
+  <li>Modul <b>aset tetap &amp; penyusutan otomatis</b> (kini via Jurnal Umum berkala).</li>
+  <li>Modul <b>penggajian (payroll) penuh</b> massal (kini gaji dicatat via Jurnal Umum).</li>
+  <li><b>Pelepasan pembatasan</b> aset neto secara otomatis saat syarat terpenuhi.</li>
+  <li><b>Notifikasi</b> (dalam aplikasi/email) untuk dokumen yang menunggu persetujuan.</li>
+  <li>Integrasi <b>e-Bupot/e-Faktur</b> dan pembuatan berkas SPT masa pajak.</li>
+  <li><b>Pemulihan (restore) backup</b> mandiri dari antarmuka.</li>
+</ul>
+
+<h3 id="d6-versi">D.6 Informasi Versi &amp; Kontak</h3>
+<table class="tbl"><tbody>
+  <tr><td style="width:220px;"><b>Dokumen</b></td><td>Manual Penggunaan SIKEU Tazkia</td></tr>
+  <tr><td><b>Versi dokumen</b></td><td>1.0</td></tr>
+  <tr><td><b>Aplikasi</b></td><td>SIKEU Tazkia — Sistem Informasi Keuangan &amp; Akuntansi</td></tr>
+  <tr><td><b>Untuk</b></td><td>Yayasan Tazkia Cendikia (STMIK &amp; Universitas Tazkia)</td></tr>
+  <tr><td><b>Administrator sistem</b></td><td>[nama &amp; kontak admin — lengkapi sebelum distribusi]</td></tr>
+  <tr><td><b>Cara memperbarui</b></td><td>Perbarui screenshot dengan <span class="mono">npm run docs:screenshots</span>, lalu rakit ulang manual dengan <span class="mono">npm run docs:manual</span>.</td></tr>
+</tbody></table>
+<div class="callout note">Manual ini menyertakan data contoh untuk ilustrasi. Angka pada
+screenshot merupakan data demo, bukan data keuangan sebenarnya.</div>

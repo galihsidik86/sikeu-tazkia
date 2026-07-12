@@ -1,0 +1,152 @@
+<h2 id="bagian-c">Bagian C — Prosedur dan Perlakuan Akuntansi</h2>
+<p class="lead">Bagian ini ditujukan untuk <b>Staf Akuntansi dan auditor</b>. Ditulis lebih
+teknis, memuat kebijakan akuntansi ringkas dan contoh jurnal berangka. Setiap sub-bab
+ditutup kotak <b>"Di SIKEU"</b> yang menghubungkan perlakuan ke fitur konkret di aplikasi.</p>
+
+<h3 id="c1-kebijakan">C.1 Kebijakan Akuntansi Ringkas</h3>
+<ul>
+  <li><b>Basis akrual.</b> Pendapatan dan beban diakui saat terjadi, bukan saat kas
+    diterima/dibayar.</li>
+  <li><b>Penyajian ISAK 35.</b> Sebagai entitas nirlaba, laporan terdiri atas Laporan
+    Posisi Keuangan, Penghasilan Komprehensif, Perubahan Aset Neto, dan Arus Kas.</li>
+  <li><b>Klasifikasi aset neto.</b> Aset neto dipilah menjadi <b>tanpa pembatasan</b> dan
+    <b>dengan pembatasan</b> dari pemberi sumber daya.</li>
+  <li><b>Satuan &amp; pembulatan.</b> Nilai disimpan sebagai bilangan bulat (sen) untuk
+    menghindari galat pembulatan, dan disajikan dalam format Rupiah.</li>
+</ul>
+
+<h3 id="c2-psak72">C.2 Pengakuan Pendapatan UKT (PSAK 72)</h3>
+<p>UKT diterima di muka untuk masa manfaat satu semester, sehingga <b>tidak</b> langsung
+diakui sebagai pendapatan. Pendapatan diakui bertahap (amortisasi) selama tenor. Contoh:
+UKT Rp 12.000.000, tenor 6 bulan.</p>
+
+<h4>1) Penerbitan tagihan</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 1131 Piutang UKT Mahasiswa</td><td class="r">12.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 2120 Pendapatan Diterima di Muka — UKT</td><td class="r"></td><td class="r">12.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">12.000.000</td><td class="r">12.000.000</td></tr></table>
+
+<h4>2) Penerimaan pembayaran</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 1121 Bank</td><td class="r">12.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 1131 Piutang UKT Mahasiswa</td><td class="r"></td><td class="r">12.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">12.000.000</td><td class="r">12.000.000</td></tr></table>
+
+<h4>3) Amortisasi bulanan (Rp 12.000.000 ÷ 6 = Rp 2.000.000/bulan)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 2120 Pendapatan Diterima di Muka — UKT</td><td class="r">2.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 4100 Pendapatan UKT</td><td class="r"></td><td class="r">2.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">2.000.000</td><td class="r">2.000.000</td></tr></table>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Jurnal (1) terbentuk otomatis saat
+<b>Generate tagihan massal</b> (B.4.2); jurnal (2) saat <b>Catat bayar</b> (B.4.3); jurnal
+(3) saat menjalankan <b>Pengakuan pendapatan</b> bulanan (B.4.5). Semua di modul
+<i>Piutang UKT</i>.</div>
+
+<h3 id="c3-ckpn">C.3 CKPN Piutang Mahasiswa (PSAK 71)</h3>
+<p>Cadangan Kerugian Penurunan Nilai (CKPN) memperkirakan piutang yang berpotensi tak
+tertagih, dihitung per <b>bucket umur</b> dengan tarif kebijakan:</p>
+<table class="tbl"><thead><tr><th>Bucket umur</th><th class="c">Tarif</th><th class="r">Contoh saldo</th><th class="r">CKPN</th></tr></thead>
+<tbody>
+<tr><td>Belum jatuh tempo</td><td class="c">0%</td><td class="r">18.000.000</td><td class="r">0</td></tr>
+<tr><td>1–30 hari</td><td class="c">5%</td><td class="r">16.500.000</td><td class="r">825.000</td></tr>
+<tr><td>31–60 hari</td><td class="c">10%</td><td class="r">21.000.000</td><td class="r">2.100.000</td></tr>
+<tr><td>61–90 hari</td><td class="c">25%</td><td class="r">15.000.000</td><td class="r">3.750.000</td></tr>
+<tr><td>&gt; 90 hari</td><td class="c">50%</td><td class="r">49.500.000</td><td class="r">24.750.000</td></tr>
+<tr class="tot" style="font-weight:700;"><td>Total</td><td class="c"></td><td class="r">120.000.000</td><td class="r">31.425.000</td></tr>
+</tbody></table>
+<p>Jurnal penyesuaian (menaikkan cadangan ke saldo yang ditargetkan):</p>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5800 Beban CKPN</td><td class="r">31.425.000</td><td class="r"></td></tr>
+<tr><td>(K) 1139 CKPN Piutang UKT (kontra-aset)</td><td class="r"></td><td class="r">31.425.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">31.425.000</td><td class="r">31.425.000</td></tr></table>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Buka <i>Piutang UKT → Aging &amp; CKPN</i>
+(B.4.4). Tarif tiap bucket dapat dikonfigurasi. Tombol <b>Buat draft CKPN</b> menghasilkan
+jurnal di atas berstatus <b>draft</b> — ditinjau dan diajukan seperti jurnal biasa.
+Direview setidaknya setiap akhir bulan/triwulan.</div>
+
+<h3 id="c4-antarunit">C.4 Transaksi Antar-Unit</h3>
+<p>Dipakai saat satu unit menanggung/meminjamkan dana untuk unit lain. Kedua sisi dicatat
+dengan akun antar-unit. Contoh: Yayasan menalangi honor dosen STMIK Rp 30.000.000.</p>
+<h4>Di sisi Yayasan (pemberi)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 1140 Piutang Antar-Unit</td><td class="r">30.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 1122 Bank</td><td class="r"></td><td class="r">30.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">30.000.000</td><td class="r">30.000.000</td></tr></table>
+<h4>Di sisi STMIK (penerima)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5300 Honor Dosen Luar Biasa</td><td class="r">30.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 2150 Utang Antar-Unit</td><td class="r"></td><td class="r">30.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">30.000.000</td><td class="r">30.000.000</td></tr></table>
+<p>Saat <b>konsolidasi</b>, Piutang Antar-Unit (Rp 30.000.000) dan Utang Antar-Unit
+(Rp 30.000.000) <b>saling menghapus menjadi nol</b> — sehingga tidak membesarkan aset dan
+liabilitas gabungan secara semu.</p>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Gunakan akun bertanda <i>antar-unit</i>
+(1140 / 2150). Dashboard menampilkan <b>status eliminasi</b>; jika saldo konsolidasi belum
+nol, telusuri via <i>Buku Besar</i> akun antar-unit untuk menemukan pasangan yang belum
+klop.</div>
+
+<h3 id="c5-hibah">C.5 Sumbangan/Hibah Terikat</h3>
+<p>Hibah dengan syarat penggunaan dicatat sebagai <b>aset neto dengan pembatasan</b>.
+Contoh: hibah beasiswa terikat Rp 75.000.000.</p>
+<h4>Penerimaan hibah terikat</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 1123 Bank</td><td class="r">75.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 4300 Hibah/Sumbangan Terikat <span class="pill">dengan pembatasan</span></td><td class="r"></td><td class="r">75.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">75.000.000</td><td class="r">75.000.000</td></tr></table>
+<h4>Pelepasan pembatasan (saat syarat terpenuhi, mis. beasiswa disalurkan)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) Aset Neto Dengan Pembatasan — pelepasan</td><td class="r">75.000.000</td><td class="r"></td></tr>
+<tr><td>(K) Aset Neto Tanpa Pembatasan — pelepasan</td><td class="r"></td><td class="r">75.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">75.000.000</td><td class="r">75.000.000</td></tr></table>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Penerimaan dapat dicatat via <i>Kas &amp;
+Bank</i> dengan kategori "Hibah/sumbangan terikat", atau via Jurnal Umum. Pelepasan
+pembatasan dicatat sebagai <b>jurnal reklasifikasi</b> di Jurnal Umum. Efeknya tampak pada
+<i>Laporan Perubahan Aset Neto</i> (kolom tanpa/dengan pembatasan).</div>
+
+<h3 id="c6-gaji">C.6 Beban Gaji, PPh 21 &amp; BPJS</h3>
+<p>Pembayaran gaji melibatkan potongan yang menjadi utang kepada pihak ketiga. Contoh:
+gaji Rp 85.000.000, PPh 21 Rp 1.700.000, BPJS (bagian pegawai) Rp 3.000.000.</p>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5100 Beban Gaji &amp; Tunjangan</td><td class="r">85.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 2130 Utang PPh 21</td><td class="r"></td><td class="r">1.700.000</td></tr>
+<tr><td>(K) 2140 Utang BPJS</td><td class="r"></td><td class="r">3.000.000</td></tr>
+<tr><td>(K) 1121 Bank (dibayarkan neto)</td><td class="r"></td><td class="r">80.300.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">85.000.000</td><td class="r">85.000.000</td></tr></table>
+<p>Utang PPh 21 kemudian disetor ke kas negara (mengurangi utang dan bank). Untuk
+honorarium bukan pegawai tetap, pemotongan PPh 21 dilakukan melalui modul <i>Pajak</i>.</p>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Jurnal gaji penuh dicatat via
+<i>Jurnal Umum</i>. Pemotongan &amp; <b>penyetoran PPh 21/23</b> honorarium dikelola di modul
+<i>Pajak (PPh)</i> — pemotongan, rekap masa, dan setor (menghasilkan jurnal otomatis).</div>
+
+<h3 id="c7-penyusutan">C.7 Penyusutan &amp; Imbalan Pascakerja (PSAK 24)</h3>
+<h4>Penyusutan aset tetap (berkala)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5700 Beban Penyusutan</td><td class="r">18.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 1290 Akumulasi Penyusutan (kontra-aset)</td><td class="r"></td><td class="r">18.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">18.000.000</td><td class="r">18.000.000</td></tr></table>
+<h4>Provisi imbalan pascakerja (PSAK 24)</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5xxx Beban Imbalan Pascakerja</td><td class="r">10.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 2210 Provisi Imbalan Pascakerja</td><td class="r"></td><td class="r">10.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">10.000.000</td><td class="r">10.000.000</td></tr></table>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Keduanya dicatat sebagai <b>jurnal
+berkala</b> melalui <i>Jurnal Umum</i> (akun 5700/1290 dan 2210 telah tersedia di COA).
+Belum ada modul aset tetap/penyusutan khusus — lihat <i>Pengembangan selanjutnya</i>.</div>
+
+<h3 id="c8-tutupbuku">C.8 Tutup Buku Tahunan</h3>
+<p>Pada akhir tahun, akun nominal (pendapatan &amp; beban) ditutup ke <b>aset neto</b>
+sehingga saldo awal tahun berikutnya nol. Secara ringkas, surplus/defisit tiap unit
+dipindahkan:</p>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 4xxx Seluruh Pendapatan</td><td class="r">xxx</td><td class="r"></td></tr>
+<tr><td>(K) 5xxx Seluruh Beban</td><td class="r"></td><td class="r">xxx</td></tr>
+<tr><td>(K) 3100/3200 Aset Neto (surplus)</td><td class="r"></td><td class="r">selisih</td></tr>
+<tr class="tot"><td>Total</td><td class="r">xxx</td><td class="r">xxx</td></tr></table>
+<p>Pendapatan/beban <b>dengan pembatasan</b> ditutup ke Aset Neto Dengan Pembatasan;
+sisanya ke Aset Neto Tanpa Pembatasan.</p>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Buka <i>Administrasi → Tutup Buku Tahunan</i>
+(B.8). Sistem membentuk jurnal penutup otomatis <b>per unit</b>, mengunci periode tahun
+tersebut. Tutup buku dapat <b>dibatalkan</b> (membalik jurnal penutup &amp; membuka periode)
+oleh peran berwenang bila diperlukan, dan seluruhnya tercatat di jejak audit.</div>
+<div class="figure"><img src="../screenshots/08-laporan-03-perubahan-aset-neto.png" alt="Perubahan aset neto">
+  <div class="caption"><b>Gambar C.1</b> — Laporan Perubahan Aset Neto (tanpa/dengan pembatasan).</div></div>

@@ -1,0 +1,143 @@
+<h2 id="bagian-a">Bagian A — Pendahuluan</h2>
+<p class="lead">Bagian ini memperkenalkan SIKEU Tazkia: untuk apa sistem ini, siapa saja
+penggunanya, cara masuk pertama kali, dan konsep dasar yang perlu dipahami setiap
+pengguna sebelum mulai bekerja. Tidak diperlukan latar belakang akuntansi untuk
+membaca bagian ini.</p>
+
+<h3 id="a1-tentang">A.1 Tentang SIKEU Tazkia</h3>
+<p><b>SIKEU Tazkia</b> (Sistem Informasi Keuangan dan Akuntansi) adalah aplikasi web
+untuk mengelola pembukuan <b>Yayasan Tazkia Cendikia</b> beserta unit-unit di bawahnya
+secara terpusat, rapi, dan dapat diaudit. Sistem mencatat setiap transaksi keuangan,
+menjaga agar pembukuan selalu seimbang, dan menghasilkan laporan keuangan sesuai
+standar yang berlaku untuk entitas nirlaba.</p>
+
+<h4>Cakupan unit</h4>
+<p>SIKEU membukukan tiga unit kerja sekaligus dan menyajikannya secara terpisah
+maupun gabungan (konsolidasi):</p>
+<ul>
+  <li><b>Yayasan Pusat</b> — entitas induk yang menaungi dan mendanai unit.</li>
+  <li><b>STMIK Tazkia</b> — perguruan tinggi (segmen/unit kerja).</li>
+  <li><b>Universitas Tazkia</b> — perguruan tinggi (segmen/unit kerja).</li>
+</ul>
+<p>Di pojok kanan atas layar, Anda dapat memilih melihat data <b>satu unit tertentu</b>
+atau <b>Konsolidasi — semua unit</b>. Saat konsolidasi, transaksi antar-unit otomatis
+saling menghapus (eliminasi) agar tidak terjadi penghitungan ganda.</p>
+
+<h4>Prinsip utama sistem</h4>
+<ul>
+  <li><b>Berpasangan (double-entry).</b> Setiap jurnal harus seimbang: total sisi Debit
+    sama dengan total sisi Kredit. Sistem menolak jurnal yang tidak seimbang.</li>
+  <li><b>Multi-unit dengan eliminasi.</b> Setiap baris jurnal wajib menyebut unit.
+    Akun antar-unit (mis. <span class="mono">Piutang/Utang Antar-Unit</span>) dieliminasi
+    saat konsolidasi.</li>
+  <li><b>Persetujuan berjenjang.</b> Transaksi dibuat oleh satu peran, lalu
+    <b>disetujui</b> peran lain sebelum benar-benar memengaruhi saldo.</li>
+  <li><b>Jejak audit.</b> Setiap tindakan penting (buat, ajukan, setujui, tolak, balik,
+    login, ganti sandi) dicatat lengkap dengan pelaku dan waktunya.</li>
+  <li><b>Sesuai ISAK 35.</b> Laporan keuangan disajikan untuk entitas nirlaba, dengan
+    klasifikasi <b>aset neto tanpa/dengan pembatasan</b>.</li>
+</ul>
+<div class="callout note">Manual ini mendokumentasikan fitur yang <b>sudah tersedia</b>
+di sistem. Fitur yang direncanakan namun belum dibangun disebut terpisah pada bagian
+<i>Pengembangan selanjutnya</i>.</div>
+
+<h3 id="a2-peran">A.2 Peran dan Hak Akses</h3>
+<p>Setiap pengguna memiliki satu <b>peran</b> yang menentukan menu dan tindakan yang
+boleh dilakukannya. Pembagian peran ini menegakkan prinsip persetujuan berjenjang —
+misalnya, orang yang <i>membuat</i> jurnal umumnya bukan orang yang <i>menyetujuinya</i>.</p>
+<ul>
+  <li><b>Administrator</b> — mengelola data acuan (bagan akun, unit, periode, pengguna),
+    backup, dan seluruh fungsi sistem.</li>
+  <li><b>Staf Akuntansi</b> — pencatat utama: jurnal, kas, piutang, pajak, anggaran.</li>
+  <li><b>Kasir</b> — mencatat penerimaan dan pengeluaran kas harian tanpa perlu memahami
+    debit/kredit.</li>
+  <li><b>Bendahara</b> — <b>menyetujui</b> jurnal &amp; transaksi kas, rekonsiliasi, dan
+    proses bulanan.</li>
+  <li><b>Kepala Unit</b> — memantau laporan dan kinerja unitnya.</li>
+  <li><b>Pengurus Yayasan</b> — <b>mengesahkan anggaran (RKAT)</b>, menyetujui, dan
+    memantau seluruh yayasan.</li>
+</ul>
+<p>Matriks berikut merangkum kewenangan tiap peran. Tanda ● berarti berwenang.</p>
+<!--MATRIKS_PERAN-->
+<p class="caption"><b>Tabel A.1</b> — Matriks peran × kewenangan.</p>
+
+<h3 id="a3-memulai">A.3 Memulai</h3>
+
+<h4>Masuk ke sistem (login)</h4>
+<ol class="steps">
+  <li>Buka alamat SIKEU di peramban (mis. <span class="mono">https://sikeu.tazkia.ac.id</span>).</li>
+  <li>Masukkan <b>email</b> dan <b>kata sandi</b> yang diberikan Administrator.</li>
+  <li>Klik <b>Masuk</b>. Bila benar, Anda diarahkan ke <b>Dashboard</b>.</li>
+</ol>
+<div class="figure"><img src="../screenshots/01-mulai-01-login.png" alt="Halaman login">
+  <div class="caption"><b>Gambar A.1</b> — Halaman masuk SIKEU Tazkia.</div></div>
+<div class="callout warn">Jika muncul pesan <i>"Email atau kata sandi salah"</i>, periksa
+kembali penulisan email. Setelah beberapa kali gagal dan Anda lupa sandi, hubungi
+Administrator untuk pengaturan ulang.</div>
+
+<h4>Mengenal tata letak</h4>
+<p>Setelah masuk, layar terbagi menjadi tiga bagian utama. Nomor pada gambar merujuk
+penjelasan di bawahnya.</p>
+<div class="figure"><img src="../screenshots/01-mulai-02-dashboard.png" alt="Dashboard beranotasi">
+  <div class="caption"><b>Gambar A.2</b> — Dashboard eksekutif dan elemen navigasi utama.</div></div>
+<ol>
+  <li><b>Menu samping (sidebar)</b> — seluruh modul, dikelompokkan menjadi
+    <i>Transaksi</i>, <i>Pelaporan</i>, dan <i>Pengaturan</i>. Menu yang tampil menyesuaikan
+    peran Anda.</li>
+  <li><b>Pemilih unit</b> — berpindah antara satu unit dan tampilan
+    <i>Konsolidasi — semua unit</i>.</li>
+  <li><b>Ganti Sandi</b> — mengubah kata sandi Anda sendiri (lihat di bawah).</li>
+  <li><b>Kartu ringkasan &amp; panel</b> — angka kunci keuangan, termasuk kartu
+    <b>Menunggu Persetujuan</b> yang menjadi pusat kerja para penyetuju.</li>
+</ol>
+
+<h4>Mengganti kata sandi</h4>
+<ol class="steps">
+  <li>Klik tombol <b>Ganti Sandi</b> di kanan atas.</li>
+  <li>Isi <b>kata sandi lama</b>, lalu <b>kata sandi baru</b> (minimal 8 karakter) dan ulangi.</li>
+  <li>Klik <b>Simpan</b>. Gunakan kata sandi baru pada login berikutnya.</li>
+</ol>
+<div class="figure"><img src="../screenshots/01-mulai-03-ganti-sandi.png" alt="Dialog ganti sandi" style="max-width:560px;display:block;margin:0 auto;">
+  <div class="caption"><b>Gambar A.3</b> — Dialog ganti kata sandi.</div></div>
+<div class="callout tip">Ganti kata sandi awal dari Administrator segera setelah login
+pertama, dan gunakan kata sandi yang unik untuk akun SIKEU Anda.</div>
+
+<h3 id="a4-konsep">A.4 Konsep Penting untuk Semua Pengguna</h3>
+
+<h4>Status dokumen</h4>
+<p>Setiap jurnal/transaksi memiliki <b>status</b> yang menunjukkan posisinya dalam alur
+persetujuan:</p>
+<div class="status-row">
+  <span class="badge b-draft">Draft</span>
+  <span class="badge b-pending">Menunggu</span>
+  <span class="badge b-posted">Diposting</span>
+  <span class="badge b-rev">Dibalik</span>
+  <span class="badge b-rej">Ditolak</span>
+</div>
+<ul>
+  <li><b>Draft</b> — masih disusun; boleh diubah atau dihapus; <i>belum</i> memengaruhi saldo.</li>
+  <li><b>Menunggu Persetujuan</b> — sudah diajukan; menunggu keputusan penyetuju;
+    belum memengaruhi saldo.</li>
+  <li><b>Diposting</b> — sudah disetujui dan <b>memengaruhi saldo</b>. Bersifat final.</li>
+  <li><b>Dibalik</b> — jurnal terposting yang dikoreksi melalui jurnal balik.</li>
+  <li><b>Ditolak</b> — pengajuan yang tidak disetujui, disertai alasan.</li>
+</ul>
+
+<h4>Mengapa jurnal yang sudah diposting tidak bisa diedit</h4>
+<p>Demi integritas dan keperluan audit, jurnal berstatus <b>Diposting</b> bersifat
+<b>permanen</b> — tidak dapat diubah atau dihapus. Bila terjadi kesalahan, koreksi
+dilakukan dengan membuat <b>jurnal balik (reversal)</b>: sistem otomatis membentuk jurnal
+kebalikannya sehingga efek jurnal keliru ternetralkan, lalu Anda membuat jurnal yang
+benar. Dengan cara ini, riwayat asli tetap terlihat dan jejak koreksi terdokumentasi.</p>
+<div class="callout warn"><b>Tidak bisa dibatalkan diam-diam.</b> Menghapus atau
+mengubah angka jurnal terposting <i>tidak</i> tersedia — ini disengaja. Selalu gunakan
+jurnal balik untuk koreksi. (Lihat prosedur di <b>B.2</b>.)</div>
+
+<h4>Kunci periode</h4>
+<p>Pembukuan dibagi per <b>periode</b> bulanan. Setelah sebuah periode direkonsiliasi dan
+ditutup, periode itu <b>dikunci</b>: tidak ada lagi jurnal yang boleh masuk ke tanggal
+dalam periode tersebut. Ini menjaga agar laporan yang sudah difinalisasi tidak berubah
+di kemudian hari. Jika Anda mencoba memposting ke periode terkunci, sistem menolaknya.</p>
+<div class="callout note">Membuka kembali periode/tahun yang sudah ditutup hanya dapat
+dilakukan peran tertentu (Bendahara/Pengurus/Admin) dan tercatat di jejak audit. Lihat
+<b>B.8</b> dan <b>C.8</b>.</div>

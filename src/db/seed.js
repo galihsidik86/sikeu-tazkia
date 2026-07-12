@@ -91,10 +91,13 @@ async function seed() {
 
   await post({ tanggal: '2026-01-02', unit_id: units.YYS, deskripsi: 'Saldo awal kas & bank Yayasan 2026',
     lines: [{ account_id: accId['1122'], unit_id: units.YYS, debit: 500000000 }, { account_id: accId['1111'], unit_id: units.YYS, debit: 25000000 }, { account_id: accId['3100'], unit_id: units.YYS, kredit: 525000000 }] });
-  await post({ tanggal: '2026-02-01', unit_id: units.STM, deskripsi: 'Penerbitan tagihan UKT semester genap — STMIK',
-    lines: [{ account_id: accId['1131'], unit_id: units.STM, debit: 180000000 }, { account_id: accId['4100'], unit_id: units.STM, kredit: 180000000 }] });
-  await post({ tanggal: '2026-02-15', unit_id: units.STM, deskripsi: 'Penerimaan pembayaran UKT — STMIK',
-    lines: [{ account_id: accId['1121'], unit_id: units.STM, debit: 120000000 }, { account_id: accId['1131'], unit_id: units.STM, kredit: 120000000 }] });
+  await post({ tanggal: '2026-03-25', unit_id: units.STM, deskripsi: 'Pembayaran gaji & tunjangan pegawai Maret 2026 — STMIK',
+    lines: [{ account_id: accId['5100'], unit_id: units.STM, debit: 85000000 },
+      { account_id: accId['2130'], unit_id: units.STM, kredit: 1700000 },
+      { account_id: accId['2140'], unit_id: units.STM, kredit: 3000000 },
+      { account_id: accId['1121'], unit_id: units.STM, kredit: 80300000 }] });
+  await post({ tanggal: '2026-06-30', unit_id: units.STM, deskripsi: 'Penyusutan gedung & peralatan semester I 2026 — STMIK',
+    lines: [{ account_id: accId['5700'], unit_id: units.STM, debit: 18000000 }, { account_id: accId['1290'], unit_id: units.STM, kredit: 18000000 }] });
   await post({ tanggal: '2026-03-10', unit_id: units.UNV, deskripsi: 'Hibah beasiswa terikat dari donatur — Universitas',
     lines: [{ account_id: accId['1123'], unit_id: units.UNV, debit: 75000000 }, { account_id: accId['4300'], unit_id: units.UNV, kredit: 75000000 }] });
   await post({ tanggal: '2026-04-05', unit_id: units.YYS, deskripsi: 'Talangan honor dosen STMIK oleh Yayasan',
@@ -128,9 +131,14 @@ async function seed() {
   for (let i = 0; i < cats.length; i++) { const [j, n, k] = cats[i]; cat[n] = (await insCat.run(j, n, accId[k], i)).lastInsertRowid; }
 
   const kasTx = [
+    ['receipt', '2026-03-08', cat['Pendapatan pendaftaran'], 6500000, 'Penerimaan pendaftaran jalur prestasi'],
+    ['payment', '2026-03-22', cat['Listrik, air & internet'], 4200000, 'Pembayaran internet kampus Maret'],
+    ['receipt', '2026-04-12', cat['Sumbangan tidak terikat'], 10000000, 'Sumbangan alumni'],
+    ['payment', '2026-05-06', cat['Beban operasional kampus'], 2750000, 'Pembelian bahan praktikum'],
     ['receipt', '2026-06-05', cat['Pendapatan pendaftaran'], 8500000, 'Penerimaan pendaftaran gelombang 1'],
     ['payment', '2026-06-20', cat['Beban operasional kampus'], 3250000, 'Pembelian ATK kantor'],
-    ['receipt', '2026-06-28', cat['Pembayaran UKT mahasiswa'], 15000000, 'Pelunasan UKT mahasiswa'],
+    ['receipt', '2026-06-28', cat['Pendapatan lain-lain'], 5000000, 'Penerimaan sewa aula & lain-lain'],
+    ['receipt', '2026-07-04', cat['Pendapatan pendaftaran'], 7000000, 'Penerimaan pendaftaran gelombang 2'],
   ];
   for (const [jenis, tgl, category_id, amount, catatan] of kasTx) {
     const fn = jenis === 'receipt' ? cash.createReceipt : cash.createPayment;
@@ -140,23 +148,65 @@ async function seed() {
 
   // ---------------- Mahasiswa & Piutang UKT ----------------
   const insStu = db.prepare('INSERT INTO students (nim,nama,prodi,unit_id,angkatan,status) VALUES (?,?,?,?,?,?)');
-  const stu = {};
-  stu.ahmad = (await insStu.run('2201001', 'Ahmad Fauzi', 'Teknik Informatika', units.STM, 2022, 'aktif')).lastInsertRowid;
-  stu.siti = (await insStu.run('2201002', 'Siti Nurhaliza', 'Sistem Informasi', units.STM, 2022, 'aktif')).lastInsertRowid;
-  stu.budi = (await insStu.run('2301003', 'Budi Santoso', 'Teknik Informatika', units.STM, 2023, 'aktif')).lastInsertRowid;
-  stu.dewi = (await insStu.run('2401001', 'Dewi Lestari', 'Manajemen', units.UNV, 2024, 'aktif')).lastInsertRowid;
-  stu.rizki = (await insStu.run('2401002', 'Rizki Pratama', 'Akuntansi', units.UNV, 2024, 'aktif')).lastInsertRowid;
-  stu.putri = (await insStu.run('2301004', 'Putri Ananda', 'Hukum', units.UNV, 2023, 'aktif')).lastInsertRowid;
+  const mhs = [
+    ['2201001', 'Ahmad Fauzi', 'Teknik Informatika', 'STM', 2022],
+    ['2201002', 'Siti Nurhaliza', 'Sistem Informasi', 'STM', 2022],
+    ['2301003', 'Budi Santoso', 'Teknik Informatika', 'STM', 2023],
+    ['2301005', 'Rina Marlina', 'Sistem Informasi', 'STM', 2023],
+    ['2401006', 'Dandi Kurniawan', 'Teknik Informatika', 'STM', 2024],
+    ['2101007', 'Fitri Handayani', 'Sistem Informasi', 'STM', 2021],
+    ['2501014', 'Yoga Prasetya', 'Teknik Informatika', 'STM', 2025],
+    ['2401001', 'Dewi Lestari', 'Manajemen', 'UNV', 2024],
+    ['2401002', 'Rizki Pratama', 'Akuntansi', 'UNV', 2024],
+    ['2301004', 'Putri Ananda', 'Hukum', 'UNV', 2023],
+    ['2201010', 'Agus Setiawan', 'Manajemen', 'UNV', 2022],
+    ['2301011', 'Nabila Zahra', 'Akuntansi', 'UNV', 2023],
+    ['2101012', 'Hendra Gunawan', 'Hukum', 'UNV', 2021],
+    ['2401013', 'Maya Sari', 'Manajemen', 'UNV', 2024],
+  ];
+  const stu = {}, ukByNim = {};
+  for (const [nim, nama, prodi, uk, ang] of mhs) {
+    stu[nim] = (await insStu.run(nim, nama, prodi, units[uk], ang, 'aktif')).lastInsertRowid;
+    ukByNim[nim] = uk;
+  }
+  const uktOf = (uk) => uk === 'UNV' ? 12000000 : 9000000;
+  const bankOf = (uk) => uk === 'UNV' ? bankBNI : bankMandiriSTM;
+  const mkInv = (sid, semester, nominal, tanggal, due, mulai) => piutang.createInvoice(staf, {
+    student_id: sid, semester, nominal, tanggal, jatuh_tempo: due, tenor_bulan: 6, mulai_amortisasi: mulai });
+  const pay = (invId, tanggal, nominal, uk) => piutang.recordPayment(staf, {
+    invoice_id: invId, tanggal, nominal, metode: 'transfer', bank_account_id: bankOf(uk) });
 
-  const inv = (student_id, nominal, jatuh_tempo) => piutang.createInvoice(staf, {
-    student_id, semester: '2026 Genap', nominal, tanggal: '2026-02-01', jatuh_tempo, tenor_bulan: 6, mulai_amortisasi: '2026-02-01' });
-  const iAhmad = await inv(stu.ahmad, 9000000, '2026-02-28');
-  await inv(stu.siti, 9000000, '2026-06-30');
-  await inv(stu.budi, 9000000, '2026-08-31');
-  await inv(stu.dewi, 12000000, '2026-05-15');
-  await inv(stu.rizki, 12000000, '2026-07-05');
-  await inv(stu.putri, 12000000, '2026-04-20');
-  await piutang.recordPayment(staf, { invoice_id: iAhmad.id, tanggal: '2026-03-10', nominal: 3000000, metode: 'transfer', bank_account_id: bankMandiriSTM });
+  // Semester 2025 Ganjil (mahasiswa angkatan ≤ 2024): mayoritas lunas, dua menunggak (aging dalam)
+  const nunggakGanjil = new Set(['2101007', '2101012']);
+  for (const [nim, , , uk, ang] of mhs) {
+    if (ang > 2024) continue;
+    const inv = await mkInv(stu[nim], '2025 Ganjil', uktOf(uk), '2025-09-01', '2025-10-10', '2025-09-01');
+    if (!nunggakGanjil.has(nim)) await pay(inv.id, '2025-09-20', uktOf(uk), uk);
+  }
+
+  // Semester 2026 Genap (semua): variasi jatuh tempo & status bayar untuk demo aging & CKPN
+  // [nim, jatuh_tempo, bayar]  bayar: 'full' | 'partial' | 'none'
+  const genapPlan = [
+    ['2201001', '2026-03-10', 'partial'], ['2201002', '2026-06-25', 'full'], ['2301003', '2026-08-31', 'none'],
+    ['2301005', '2026-05-20', 'none'], ['2401006', '2026-06-28', 'partial'], ['2101007', '2026-04-25', 'none'],
+    ['2501014', '2026-07-31', 'none'], ['2401001', '2026-03-05', 'none'], ['2401002', '2026-06-20', 'full'],
+    ['2301004', '2026-04-30', 'partial'], ['2201010', '2026-06-30', 'none'], ['2301011', '2026-05-15', 'none'],
+    ['2101012', '2026-03-01', 'none'], ['2401013', '2026-08-15', 'full'],
+  ];
+  for (const [nim, due, bayar] of genapPlan) {
+    const uk = ukByNim[nim], nominal = uktOf(uk);
+    const inv = await mkInv(stu[nim], '2026 Genap', nominal, '2026-02-01', due, '2026-02-01');
+    if (bayar === 'full') await pay(inv.id, '2026-02-25', nominal, uk);
+    else if (bayar === 'partial') {
+      await pay(inv.id, '2026-02-20', Math.round(nominal * 0.3), uk);
+      await pay(inv.id, '2026-04-15', Math.round(nominal * 0.2), uk);
+    }
+  }
+
+  // Pengakuan pendapatan (PSAK 72): amortisasi bulanan → mengisi tren penerimaan & histori pengakuan
+  for (const [th, bl] of [[2025, 9], [2025, 10], [2025, 11], [2026, 2], [2026, 3], [2026, 4], [2026, 5], [2026, 6], [2026, 7]]) {
+    try { await piutang.runAmortisasi(staf, th, bl); } catch (_) { /* lewati periode terkunci */ }
+  }
 
   // ---------------- Anggaran RKAT 2026 ----------------
   const insBudget = db.prepare("INSERT INTO budgets (tahun,unit_id,account_id,nominal,status) VALUES (?,?,?,?,'disahkan')");

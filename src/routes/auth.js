@@ -26,4 +26,11 @@ router.get('/me', h(async (req, res) => {
   res.json({ user });
 }));
 
+router.post('/change-password', auth.requireAuth, h(async (req) => {
+  const { old_password, new_password } = req.body || {};
+  await auth.changePassword(req.user.id, old_password, new_password);
+  await audit.log(req.user, 'change_password', 'user', req.user.id, null, ip(req));
+  return { ok: true };
+}));
+
 module.exports = router;
