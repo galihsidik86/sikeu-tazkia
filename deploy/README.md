@@ -1,12 +1,23 @@
 # Deploy SIKEU Tazkia ke VPS (Docker Compose + Caddy + GitHub Actions)
 
-Arsitektur:
+Arsitektur — **dua mode**:
+
+**Mode A · Berdiri sendiri** (server belum punya reverse proxy) — Caddy bawaan aktif:
 
 ```
-Internet ──HTTPS──▶ Caddy (80/443, auto-TLS) ──▶ app (Node/Express :3000) ──▶ db (PostgreSQL)
-                         ▲                                                        │
-              domain (DNS A record)                              volume: pgdata (data), appdata (backup)
+Internet ─HTTPS─▶ Caddy bawaan (80/443) ─▶ app (:3000) ─▶ db (PostgreSQL)
+   (aktifkan: docker compose --profile proxy up -d)
 ```
+
+**Mode B · Di belakang proxy yang sudah ada** (server sudah menjalankan Caddy/Nginx untuk
+domain lain) — **default**; Caddy bawaan TIDAK dijalankan, app diterbitkan ke loopback:
+
+```
+Internet ─HTTPS─▶ Caddy/Nginx HOST (80/443) ─▶ 127.0.0.1:${APP_PORT} ─▶ app (:3000) ─▶ db
+```
+
+Pada Mode B, tambahkan satu blok vhost di proxy host (lihat bagian 4b). `docker compose
+up -d` (tanpa `--profile proxy`) hanya menjalankan **app + db**.
 
 Deploy dipicu **otomatis** oleh GitHub Actions setiap `push` ke `main`.
 
@@ -104,6 +115,26 @@ untuk mendorong ke GHCR (izin `packages: write` sudah diatur di workflow).
 > **Alternatif build-di-VPS:** jalankan workflow **Deploy ke VPS (build di VPS — fallback
 > manual)** dari tab Actions → Run workflow. Ini memakai `deploy/deploy.sh` (build image
 > langsung di VPS) alih-alih menarik dari GHCR.
+
+## 4b. Integrasi dengan reverse proxy host (Mode B)
+
+Jika server sudah menjalankan Caddy/Nginx untuk domain lain (port 80/443 sudah dipakai),
+**jangan** aktifkan Caddy bawaan. Set `APP_PORT` ke port loopback yang bebas di `.env`,
+jalankan `docker compose up -d` (app+db saja), lalu tambahkan vhost di proxy host.
+
+**Caddy host** — tambahkan blok ke `/etc/caddy/Caddyfile` lalu `systemctl reload caddy`:
+
+```
+sikeu.tazkia.ac.id {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000    # samakan dengan APP_PORT
+}
+```
+
+**Nginx host** — buat server block yang `proxy_pass http://127.0.0.1:3000;` lalu jalankan
+`certbot --nginx -d sikeu.tazkia.ac.id`.
+
+> Prasyarat: A record domain sudah mengarah ke IP server agar penerbitan TLS berhasil.
 
 ## 5. Operasional
 

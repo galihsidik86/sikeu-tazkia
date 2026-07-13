@@ -33,11 +33,18 @@ services:
         condition: service_healthy
     volumes:
       - appdata:/app/data      # backup database otomatis tersimpan di sini
-    expose:
-      - "3000"
+    # Terbitkan ke loopback host agar reverse proxy yang sudah ada (mis. Caddy/Nginx
+    # milik server) dapat memproksikan domain ke sini. APP_PORT diatur di .env.
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
 
+  # Caddy bawaan — HANYA untuk server berdiri sendiri (belum punya reverse proxy).
+  # Aktifkan dengan:  docker compose --profile proxy up -d
+  # Bila server sudah punya Caddy/Nginx sendiri, JANGAN aktifkan (biarkan profil off)
+  # dan tambahkan vhost di proxy tersebut menuju 127.0.0.1:${APP_PORT}.
   caddy:
     image: caddy:2-alpine
+    profiles: ["proxy"]
     restart: unless-stopped
     ports:
       - "80:80"
