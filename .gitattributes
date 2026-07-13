@@ -1,0 +1,4 @@
+# Skrip & config yang dijalankan di Linux/VPS harus berakhiran LF (bukan CRLF).
+*.sh text eol=lf
+deploy/Caddyfile text eol=lf
+deploy/deploy.sh text eol=lf

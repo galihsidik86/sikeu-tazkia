@@ -1,0 +1,8 @@
+# Caddy reverse proxy dengan HTTPS otomatis (Let's Encrypt/ZeroSSL).
+# DOMAIN disuntik dari environment (docker-compose → .env).
+# Opsional: untuk notifikasi kedaluwarsa sertifikat, tambahkan blok global:
+#   { email admin@domain-anda }
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000
+}

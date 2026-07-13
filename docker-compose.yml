@@ -1,0 +1,56 @@
+# Deployment produksi SIKEU Tazkia: app + PostgreSQL + Caddy (auto-HTTPS).
+# Konfigurasi rahasia dibaca dari berkas .env (lihat .env.production.example).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sikeu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD wajib diisi di .env}
+      POSTGRES_DB: ${POSTGRES_DB:-sikeu}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sikeu} -d ${POSTGRES_DB:-sikeu}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-sikeu}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sikeu}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET wajib diisi di .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - appdata:/app/data      # backup database otomatis tersimpan di sini
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN wajib diisi di .env}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  appdata:
+  caddy_data:
+  caddy_config:
