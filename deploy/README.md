@@ -8,8 +8,17 @@ Internet ──HTTPS──▶ Caddy (80/443, auto-TLS) ──▶ app (Node/Expre
               domain (DNS A record)                              volume: pgdata (data), appdata (backup)
 ```
 
-Deploy dipicu **otomatis** oleh GitHub Actions setiap `push` ke `main`: workflow SSH ke
-VPS, menarik kode terbaru, lalu `docker compose up -d --build` + migrasi.
+Deploy dipicu **otomatis** oleh GitHub Actions setiap `push` ke `main`.
+
+**Dua alur tersedia** (pilih salah satu):
+
+| Alur | Image dibangun di | Workflow | Skrip VPS |
+|---|---|---|---|
+| **GHCR (disarankan)** | GitHub Actions → didorong ke `ghcr.io` | `build-image.yml` (otomatis) | `deploy/deploy-ghcr.sh` (pull) |
+| **Build di VPS** | di VPS saat deploy | `deploy.yml` (manual) | `deploy/deploy.sh` (build) |
+
+Alur GHCR lebih cepat & tidak membebani VPS (VPS cukup **menarik** image jadi). Panduan
+di bawah memakai alur GHCR; untuk build-di-VPS lihat bagian akhir.
 
 ---
 
@@ -43,13 +52,21 @@ tidak menghapusnya (berkas untracked tetap aman).
 
 ## 3. Peluncuran pertama
 
+Pastikan image sudah ada di GHCR (push ke `main` sekali agar `build-image.yml`
+membangunnya), lalu **jadikan package publik** agar VPS bisa menariknya tanpa login:
+GitHub → tab **Packages** → `sikeu-tazkia` → *Package settings* → **Change visibility →
+Public**. (Alternatif: login di VPS dengan `docker login ghcr.io` memakai PAT ber-scope
+`read:packages`.)
+
 ```bash
-docker compose build
+docker compose pull app                          # tarik image dari GHCR
 docker compose up -d db
-docker compose run --rm app npm run migrate    # buat skema
-docker compose run --rm app npm run seed        # HANYA sekali: buat data awal + admin
-docker compose up -d                             # jalankan app + caddy
+docker compose run --rm app npm run migrate      # buat skema
+docker compose run --rm app npm run seed          # HANYA sekali: buat data awal + admin
+docker compose up -d                              # jalankan app + caddy
 ```
+
+> Memakai build-di-VPS? Ganti `docker compose pull app` dengan `docker compose build`.
 
 > `npm run seed` membuat pengguna demo (mis. `admin1@tazkia.ac.id` / `sikeu123`) **dan
 > menghapus seluruh data lama**. Jalankan **hanya pada peluncuran pertama**. Setelah login,
@@ -79,8 +96,14 @@ tambahkan:
 | `VPS_PORT` | *(opsional)* port SSH, default `22` |
 | `VPS_APP_DIR` | *(opsional)* path repo, default `/opt/sikeu-tazkia` |
 
-Setelah itu, setiap `push` ke `main` akan otomatis men-deploy. Bisa juga dipicu manual
-di tab **Actions → Deploy ke VPS → Run workflow**.
+Setelah itu, setiap `push` ke `main` menjalankan **Build image (GHCR) & deploy**:
+GitHub Actions membangun image, mendorongnya ke GHCR, lalu SSH ke VPS untuk `docker
+compose pull` + `up`. Tidak perlu `GITHUB_TOKEN` tambahan — Actions memakai token bawaan
+untuk mendorong ke GHCR (izin `packages: write` sudah diatur di workflow).
+
+> **Alternatif build-di-VPS:** jalankan workflow **Deploy ke VPS (build di VPS — fallback
+> manual)** dari tab Actions → Run workflow. Ini memakai `deploy/deploy.sh` (build image
+> langsung di VPS) alih-alih menarik dari GHCR.
 
 ## 5. Operasional
 

@@ -1,8 +1,9 @@
-name: Deploy ke VPS
+name: Deploy ke VPS (build di VPS — fallback manual)
 
+# Alur utama memakai "Build image (GHCR) & deploy" (build-image.yml) yang otomatis
+# saat push ke main. Workflow ini adalah ALTERNATIF: build langsung di VPS, hanya
+# dipicu manual. Berguna bila GHCR tidak dipakai.
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 # Cegah dua deploy berjalan bersamaan

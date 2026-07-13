@@ -17,6 +17,9 @@ services:
       retries: 6
 
   app:
+    # Default: tarik image pra-bangun dari GHCR (alur CI). `build: .` tetap ada sebagai
+    # fallback agar bisa juga build langsung di VPS bila diperlukan.
+    image: ${APP_IMAGE:-ghcr.io/galihsidik86/sikeu-tazkia:latest}
     build: .
     restart: unless-stopped
     environment:
