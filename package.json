@@ -10,6 +10,7 @@
     "migrate": "node src/db/migrate.js",
     "seed": "node src/db/seed.js",
     "reset": "node src/db/migrate.js --fresh && node src/db/seed.js",
+    "clean": "node src/db/clean.js",
     "test": "node --test --test-concurrency=1",
     "docs:screenshots": "node scripts/screenshots.mjs",
     "docs:manual": "node scripts/build-manual.mjs",

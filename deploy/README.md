@@ -79,6 +79,16 @@ docker compose up -d                              # jalankan app + caddy
 
 > Memakai build-di-VPS? Ganti `docker compose pull app` dengan `docker compose build`.
 
+**Membersihkan data demo → siap data riil.** Setelah puas menguji, hapus seluruh data
+transaksi/demo (menyimpan bagan akun, unit, periode, konfigurasi, dan admin). Backup
+dibuat otomatis lebih dulu. Pratinjau dulu tanpa `--confirm`:
+
+```bash
+docker compose run --rm app npm run clean                                   # pratinjau
+docker compose run --rm app npm run clean -- --confirm                       # simpan semua admin
+docker compose run --rm app npm run clean -- --confirm --keep-admin=admin@tazkia.ac.id  # simpan 1 admin
+```
+
 > `npm run seed` membuat pengguna demo (mis. `admin1@tazkia.ac.id` / `sikeu123`) **dan
 > menghapus seluruh data lama**. Jalankan **hanya pada peluncuran pertama**. Setelah login,
 > segera ganti kata sandi admin dan sesuaikan data. **Jangan** pernah menjalankan `seed`
