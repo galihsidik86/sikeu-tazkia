@@ -44,10 +44,11 @@ async function seed() {
     ['3200', 'Aset Neto Dengan Pembatasan', E, '3000', 1, 'K', { netclass: 'dengan' }],
     ['3300', 'Surplus (Defisit) Tahun Berjalan', E, '3000', 1, 'K', { netclass: 'tanpa' }],
     ['4000', 'PENDAPATAN', P, null, 0, 'K', {}], ['4100', 'Pendapatan UKT', P, '4000', 1, 'K', {}],
+    ['4150', 'Potongan / Keringanan UKT', P, '4000', 1, 'D', { kontra: 1 }],
     ['4200', 'Pendapatan Pendaftaran', P, '4000', 1, 'K', {}], ['4300', 'Hibah / Sumbangan Terikat', P, '4000', 1, 'K', { netclass: 'dengan' }],
     ['4400', 'Sumbangan Tidak Terikat', P, '4000', 1, 'K', { netclass: 'tanpa' }], ['4900', 'Pendapatan Lain-lain', P, '4000', 1, 'K', {}],
     ['5000', 'BEBAN', B, null, 0, 'D', {}], ['5100', 'Beban Gaji & Tunjangan', B, '5000', 1, 'D', {}],
-    ['5200', 'Beban BPJS', B, '5000', 1, 'D', {}], ['5300', 'Honor Dosen Luar Biasa', B, '5000', 1, 'D', {}],
+    ['5200', 'Beban BPJS', B, '5000', 1, 'D', {}], ['5300', 'Honor Dosen Luar Biasa', B, '5000', 1, 'D', {}], ['5350', 'Beban Beasiswa', B, '5000', 1, 'D', {}],
     ['5400', 'Beban Operasional', B, '5000', 1, 'D', {}], ['5500', 'Beban Listrik, Air & Internet', B, '5000', 1, 'D', {}],
     ['5600', 'Beban Pemeliharaan', B, '5000', 1, 'D', {}], ['5700', 'Beban Penyusutan', B, '5000', 1, 'D', {}],
     ['5800', 'Beban CKPN', B, '5000', 1, 'D', {}], ['5900', 'Beban Akreditasi', B, '5000', 1, 'D', {}],
@@ -207,6 +208,13 @@ async function seed() {
   for (const [th, bl] of [[2025, 9], [2025, 10], [2025, 11], [2026, 2], [2026, 3], [2026, 4], [2026, 5], [2026, 6], [2026, 7]]) {
     try { await piutang.runAmortisasi(staf, th, bl); } catch (_) { /* lewati periode terkunci */ }
   }
+
+  // Contoh keringanan UKT: beasiswa (beban) & potongan (kontra-pendapatan)
+  const genapInvOf = async (nim) => (await db.prepare(
+    "SELECT id FROM invoices WHERE student_id=? AND semester='2026 Genap' ORDER BY id DESC LIMIT 1").get(stu[nim]));
+  const bInv = await genapInvOf('2301003'), pInv = await genapInvOf('2301005');
+  if (bInv) await piutang.recordRelief(staf, { invoice_id: bInv.id, jenis: 'beasiswa', nominal: 4500000, tanggal: '2026-03-01', keterangan: 'Beasiswa prestasi akademik' });
+  if (pInv) await piutang.recordRelief(staf, { invoice_id: pInv.id, jenis: 'potongan', nominal: 1500000, tanggal: '2026-03-05', keterangan: 'Keringanan ekonomi' });
 
   // ---------------- Anggaran RKAT 2026 ----------------
   const insBudget = db.prepare("INSERT INTO budgets (tahun,unit_id,account_id,nominal,status) VALUES (?,?,?,?,'disahkan')");

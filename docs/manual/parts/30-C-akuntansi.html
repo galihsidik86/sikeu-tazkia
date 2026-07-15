@@ -150,3 +150,34 @@ tersebut. Tutup buku dapat <b>dibatalkan</b> (membalik jurnal penutup &amp; memb
 oleh peran berwenang bila diperlukan, dan seluruhnya tercatat di jejak audit.</div>
 <div class="figure"><img src="../screenshots/08-laporan-03-perubahan-aset-neto.png" alt="Perubahan aset neto">
   <div class="caption"><b>Gambar C.1</b> — Laporan Perubahan Aset Neto (tanpa/dengan pembatasan).</div></div>
+
+<h3 id="c9-keringanan">C.9 Keringanan &amp; Beasiswa UKT</h3>
+<p>UKT dapat berbeda antar mahasiswa karena potongan (kebijakan harga) atau beasiswa
+(parsial/penuh, didanai yayasan/kampus maupun donor). Prinsipnya: tagih <b>bruto</b>, lalu
+catat keringanan sebagai transaksi tersendiri lewat modul Piutang — sehingga jumlah
+potongan/beasiswa <b>terlihat</b> di laporan dan buku besar Piutang tetap cocok dengan
+rincian tagihan. Contoh UKT bruto Rp 12.000.000.</p>
+
+<h4>Potongan / diskon (kebijakan harga) — kontra-pendapatan</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 4150 Potongan / Keringanan UKT</td><td class="r">2.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 1131 Piutang UKT Mahasiswa</td><td class="r"></td><td class="r">2.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">2.000.000</td><td class="r">2.000.000</td></tr></table>
+<p>4150 adalah <b>kontra-pendapatan</b> (saldo debit) sehingga mengurangi Pendapatan UKT →
+pendapatan <b>neto</b> = bruto − potongan.</p>
+
+<h4>Beasiswa (didanai yayasan/kampus) — beban</h4>
+<table class="jrnl"><tr><th>Akun</th><th class="r">Debit</th><th class="r">Kredit</th></tr>
+<tr><td>(D) 5350 Beban Beasiswa</td><td class="r">5.000.000</td><td class="r"></td></tr>
+<tr><td>(K) 1131 Piutang UKT Mahasiswa</td><td class="r"></td><td class="r">5.000.000</td></tr>
+<tr class="tot"><td>Total</td><td class="r">5.000.000</td><td class="r">5.000.000</td></tr></table>
+<p>Pendapatan UKT tetap diakui <b>penuh (bruto)</b> lewat amortisasi; beasiswa tampil
+sebagai <b>beban</b> terpisah — transparan berapa yayasan menyubsidi. Mahasiswa membayar
+sisa (parsial) atau nol (penuh). Beasiswa dari <b>donor eksternal</b> memakai jurnal yang
+sama (Beban Beasiswa), dengan penerimaan hibah &amp; pelepasan pembatasan dicatat terpisah
+(lihat C.5).</p>
+<div class="box-sikeu"><b class="tag">Di SIKEU</b> Buka <i>Piutang UKT → Daftar tagihan →
+Keringanan</i> (B.4.4), pilih jenis <b>Potongan</b> atau <b>Beasiswa</b>. Sistem memposting
+jurnal di atas dan mencatat keringanan sehingga <b>sisa tagihan, aging, CKPN, dan buku besar
+Piutang</b> tetap konsisten. Untuk UKT beda-beda per mahasiswa, terbitkan tagihan per
+individu atau generate per prodi/angkatan dengan nominal masing-masing.</div>

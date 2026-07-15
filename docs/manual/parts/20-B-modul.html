@@ -212,7 +212,28 @@ sudah punya tagihan pada semester sama dilewati otomatis.</div>
 <i>Catat bayar</i> agar buku besar Piutang tetap sinkron dengan rincian tagihan. (Lihat
 FAQ di D.4.)</div>
 
-<h4 class="proc">Prosedur B.4.4 — Membaca aging &amp; memproses CKPN</h4>
+<h4 class="proc">Prosedur B.4.4 — Mencatat keringanan / beasiswa</h4>
+<div class="proc-meta">
+  <div><span class="k">Tujuan</span>Mengurangi tagihan UKT tanpa kas (potongan/diskon atau beasiswa).</div>
+  <div><span class="k">Pelaku</span>Admin / Staf Akuntansi / Bendahara.</div>
+  <div><span class="k">Prasyarat</span>Tagihan masih bersisa.</div>
+</div>
+<ol class="steps">
+  <li>Buka tab <b>Daftar tagihan</b>, klik <b>Keringanan</b> pada baris tagihan.</li>
+  <li>Pilih <b>jenis</b>: <b>Potongan/diskon</b> (kebijakan harga) atau <b>Beasiswa</b>.</li>
+  <li>Isi <b>jumlah</b> (sebagian untuk parsial, atau seluruh sisa untuk penuh), tanggal,
+    dan keterangan. Klik <b>Simpan</b>.</li>
+</ol>
+<div class="result"><b>Hasil:</b> sisa tagihan berkurang &amp; jurnal terbentuk otomatis —
+<b>Potongan</b>: <span class="mono">(D) Potongan UKT 4150 / (K) Piutang</span> (pendapatan
+neto turun); <b>Beasiswa</b>: <span class="mono">(D) Beban Beasiswa 5350 / (K) Piutang</span>
+(pendapatan tetap bruto). Aging, CKPN, dan buku besar tetap konsisten.</div>
+<div class="figure"><img src="../screenshots/05-piutang-08-keringanan.png" alt="Keringanan/beasiswa" style="max-width:560px;display:block;margin:0 auto;">
+  <div class="caption"><b>Gambar B4.6</b> — Mencatat keringanan / beasiswa UKT.</div></div>
+<div class="callout note">Beasiswa <b>parsial</b> menutup sebagian sisa (mahasiswa membayar
+selebihnya); <b>penuh</b> menutup seluruh sisa. Perlakuan akuntansi lengkap di <b>C.9</b>.</div>
+
+<h4 class="proc">Prosedur B.4.5 — Membaca aging &amp; memproses CKPN</h4>
 <div class="proc-meta">
   <div><span class="k">Tujuan</span>Menilai umur piutang dan cadangan kerugian.</div>
   <div><span class="k">Pelaku</span>Staf Akuntansi / Bendahara.</div>
@@ -228,7 +249,7 @@ FAQ di D.4.)</div>
 <div class="figure"><img src="../screenshots/05-piutang-05-aging-ckpn.png" alt="Aging & CKPN">
   <div class="caption"><b>Gambar B4.4</b> — Umur piutang &amp; perhitungan CKPN.</div></div>
 
-<h4 class="proc">Prosedur B.4.5 — Menjalankan pengakuan pendapatan bulanan</h4>
+<h4 class="proc">Prosedur B.4.6 — Menjalankan pengakuan pendapatan bulanan</h4>
 <div class="proc-meta">
   <div><span class="k">Tujuan</span>Mengamortisasi pendapatan diterima di muka (PSAK 72).</div>
   <div><span class="k">Pelaku</span>Admin / Staf / Bendahara.</div>

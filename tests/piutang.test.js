@@ -89,3 +89,36 @@ test('generate massal melewati mahasiswa yang sudah punya tagihan semester sama'
   assert.strictEqual(r.count, 1);
   assert.strictEqual(r.total, sen(5000000));
 });
+
+test('keringanan potongan → (D)4150 (K)Piutang, sisa turun', async () => {
+  const inv = await svc.createInvoice(U, { student_id: stu2, semester: 'R-Potongan', nominal: 10000000, tanggal: '2026-02-01', jatuh_tempo: '2026-06-30', tenor_bulan: 6, mulai_amortisasi: '2026-02-01' });
+  const r = await svc.recordRelief(U, { invoice_id: inv.id, jenis: 'potongan', nominal: 2000000, tanggal: '2026-03-01', keterangan: 'diskon' });
+  assert.strictEqual(r.relief, sen(2000000));
+  assert.strictEqual(r.sisa, sen(8000000));
+  const lines = await db.prepare('SELECT jl.*, a.kode FROM journal_lines jl JOIN accounts a ON a.id=jl.account_id WHERE jl.journal_id=?').all(r.reliefs[0].journal_id);
+  assert.ok(lines.find(l => l.kode === '4150' && l.debit === sen(2000000)), 'debit 4150');
+  assert.ok(lines.find(l => l.kode === '1131' && l.kredit === sen(2000000)), 'kredit 1131');
+});
+
+test('keringanan beasiswa penuh → (D)5350 (K)Piutang, lunas', async () => {
+  const inv = await svc.createInvoice(U, { student_id: stu2, semester: 'R-Beasiswa', nominal: 10000000, tanggal: '2026-02-01', jatuh_tempo: '2026-06-30', tenor_bulan: 6, mulai_amortisasi: '2026-02-01' });
+  const r = await svc.recordRelief(U, { invoice_id: inv.id, jenis: 'beasiswa', nominal: 10000000, tanggal: '2026-03-01', keterangan: 'beasiswa penuh' });
+  assert.strictEqual(r.sisa, 0);
+  assert.strictEqual(r.status, 'lunas');
+  const lines = await db.prepare('SELECT jl.*, a.kode FROM journal_lines jl JOIN accounts a ON a.id=jl.account_id WHERE jl.journal_id=?').all(r.reliefs[0].journal_id);
+  assert.ok(lines.find(l => l.kode === '5350' && l.debit === sen(10000000)), 'debit 5350');
+  assert.ok(lines.find(l => l.kode === '1131' && l.kredit === sen(10000000)), 'kredit 1131');
+});
+
+test('keringanan melebihi sisa ditolak', async () => {
+  const inv = await svc.createInvoice(U, { student_id: stu2, semester: 'R-Tolak', nominal: 5000000, tanggal: '2026-02-01', tenor_bulan: 6, mulai_amortisasi: '2026-02-01' });
+  await assert.rejects(() => svc.recordRelief(U, { invoice_id: inv.id, jenis: 'potongan', nominal: 9000000, tanggal: '2026-03-01' }), /melebihi sisa/i);
+});
+
+test('buku besar 1131 = tagihan − pembayaran − keringanan (subsidiari sinkron)', async () => {
+  const gl = (await db.prepare("SELECT COALESCE(SUM(jl.debit-jl.kredit),0) s FROM journal_lines jl JOIN journals j ON j.id=jl.journal_id JOIN accounts a ON a.id=jl.account_id WHERE a.kode='1131' AND j.status IN ('posted','reversed')").get()).s;
+  const inv = (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM invoices').get()).s;
+  const pay = (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM payments').get()).s;
+  const rel = (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM reliefs').get()).s;
+  assert.strictEqual(gl, inv - pay - rel);
+});

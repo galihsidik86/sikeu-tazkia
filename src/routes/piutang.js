@@ -34,6 +34,9 @@ router.post('/invoices/generate', canBilling, h((req) => svc.generateInvoices(wi
 // ---- Pembayaran ----
 router.post('/payments', canPay, h((req) => svc.recordPayment(withIp(req), req.body || {})));
 
+// ---- Keringanan UKT (potongan & beasiswa) ----
+router.post('/reliefs', canBilling, h((req) => svc.recordRelief(withIp(req), req.body || {})));
+
 // ---- Aging & CKPN ----
 router.get('/aging', h(async (req) => svc.aging({ unitId: await unitIdFromKode(req.query.unit), asOf: req.query.asof })));
 router.get('/ckpn/rates', h(() => svc.listCkpnRates()));

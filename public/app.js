@@ -885,7 +885,7 @@ async function piDaftar(status) {
       <td class="r mono" style="font-weight:700;${i.sisa > 0 ? '' : 'color:var(--green);'}">${fmtNum(i.sisa)}</td>
       <td>${statusInvBadge(i.status)}</td>
       <td>${i.sisa > 0 ? umurChip(d) : '<span class="badge posted">lunas</span>'}</td>
-      <td class="r">${(perms.pay && i.sisa > 0) ? `<button class="btn sm outline" data-pay="${i.id}">Catat bayar</button>` : ''}</td></tr>`;
+      <td class="r" style="white-space:nowrap;">${(perms.pay && i.sisa > 0) ? `<button class="btn sm outline" data-pay="${i.id}">Catat bayar</button>` : ''}${(perms.billing && i.sisa > 0) ? ` <button class="btn sm gold" data-relief="${i.id}">Keringanan</button>` : ''}</td></tr>`;
   }).join('') || '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:24px;">Belum ada tagihan.</td></tr>';
   $('#piOut').innerHTML = `
     <div class="tabs" style="margin:14px 0 6px;">${chips}</div>
@@ -898,6 +898,7 @@ async function piDaftar(status) {
     </div>`;
   $('#piOut').querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', () => piDaftar(b.dataset.st || undefined)));
   $('#piOut').querySelectorAll('[data-pay]').forEach(b => b.addEventListener('click', () => payModal(+b.dataset.pay)));
+  $('#piOut').querySelectorAll('[data-relief]').forEach(b => b.addEventListener('click', () => reliefModal(+b.dataset.relief)));
 }
 function statusInvBadge(s) {
   const m = { terbit: ['pending', 'Belum dibayar'], sebagian: ['pending', 'Sebagian'], lunas: ['posted', 'Lunas'], void: ['draft', 'Batal'] };
@@ -931,6 +932,38 @@ async function payModal(invoiceId) {
       if (toSen(nominal) <= 0) throw new Error('Jumlah harus lebih dari nol.');
       await api.post('/api/piutang/payments', { invoice_id: invoiceId, tanggal: $('#pyDate').value, nominal, metode: $('#pyMet').value, bank_account_id: +$('#pyBank').value });
       toast('Pembayaran tercatat & diposting.', 'ok'); piDaftar();
+    });
+}
+
+async function reliefModal(invoiceId) {
+  const inv = await api.get('/api/piutang/invoices/' + invoiceId);
+  const relHist = (inv.reliefs || []).map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EEF4;">
+    <div><div style="font-weight:700;font-size:12.5px;">${fmtDate(r.tanggal)} · ${r.jenis === 'potongan' ? 'Potongan' : 'Beasiswa'}</div>
+      <div class="note"><span class="mono">${esc(r.akun_kode)}</span> ${esc(r.akun_nama)}${r.keterangan ? ' · ' + esc(r.keterangan) : ''}</div></div>
+    <div class="mono" style="color:var(--gold-ink);font-weight:700;">${fmtRp(r.nominal)}</div></div>`).join('') || '<div class="note">Belum ada keringanan.</div>';
+  openModal(`Keringanan UKT — ${inv.mhs_nama}`, `
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;">
+      <div class="stat" style="padding:12px 14px;"><div class="label">TAGIHAN</div><div class="value" style="font-size:15px;">${fmtRp(inv.nominal)}</div></div>
+      <div class="stat" style="padding:12px 14px;"><div class="label">KERINGANAN</div><div class="value" style="font-size:15px;color:var(--gold-ink);">${fmtRp(inv.relief)}</div></div>
+      <div class="stat" style="padding:12px 14px;background:var(--gold-bg);"><div class="label" style="color:var(--gold-ink);">SISA</div><div class="value" style="font-size:15px;">${fmtRp(inv.sisa)}</div></div>
+    </div>
+    <div class="note" style="margin-top:8px;"><span class="mono" style="color:var(--primary);">${esc(inv.nomor)}</span> · ${esc(inv.semester)} · ${esc(inv.nim)}</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px;">
+      <div class="field"><label>Jenis</label><select class="inp" id="rlJenis">
+        <option value="potongan">Potongan / diskon</option>
+        <option value="beasiswa">Beasiswa</option></select></div>
+      <div class="field"><label>Jumlah (Rp) — boleh sebagian</label><input class="inp mono r" id="rlAmt" placeholder="0"></div>
+      <div class="field"><label>Tanggal</label><input class="inp" type="date" id="rlDate" value="${new Date().toISOString().slice(0, 10)}"></div>
+      <div class="field"><label>Keterangan</label><input class="inp" id="rlKet" placeholder="mis. beasiswa prestasi / keringanan yatim"></div>
+    </div>
+    <div class="note" style="margin-top:10px;"><b>Potongan</b> → (D) Potongan UKT 4150 / (K) Piutang — mengurangi pendapatan neto.
+      <b>Beasiswa</b> → (D) Beban Beasiswa 5350 / (K) Piutang — pendapatan tetap bruto.</div>
+    <div style="margin-top:12px;font-weight:800;font-size:13px;">Riwayat keringanan</div>${relHist}`,
+    async () => {
+      const nominal = $('#rlAmt').value;
+      if (toSen(nominal) <= 0) throw new Error('Jumlah harus lebih dari nol.');
+      await api.post('/api/piutang/reliefs', { invoice_id: invoiceId, jenis: $('#rlJenis').value, nominal, tanggal: $('#rlDate').value, keterangan: $('#rlKet').value.trim() });
+      toast('Keringanan dicatat & diposting.', 'ok'); piDaftar();
     });
 }
 

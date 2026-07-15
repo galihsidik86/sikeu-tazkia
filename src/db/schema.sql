@@ -179,6 +179,21 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(invoice_id);
 
+-- Keringanan UKT: potongan (kontra-pendapatan) & beasiswa (beban). Menyelesaikan
+-- sebagian/seluruh tagihan tanpa kas, sehingga aging & subsidiari tetap konsisten.
+CREATE TABLE IF NOT EXISTS reliefs (
+  id         SERIAL PRIMARY KEY,
+  invoice_id INTEGER NOT NULL REFERENCES invoices(id),
+  tanggal    TEXT NOT NULL,
+  jenis      TEXT NOT NULL CHECK (jenis IN ('potongan','beasiswa')),
+  nominal    BIGINT NOT NULL,
+  account_id INTEGER NOT NULL REFERENCES accounts(id),
+  keterangan TEXT,
+  journal_id INTEGER REFERENCES journals(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_reliefs_invoice ON reliefs(invoice_id);
+
 CREATE TABLE IF NOT EXISTS revenue_recognition (
   id         SERIAL PRIMARY KEY,
   invoice_id INTEGER NOT NULL REFERENCES invoices(id),

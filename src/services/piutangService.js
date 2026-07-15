@@ -120,12 +120,18 @@ async function importStudents(user, b) {
 async function paidOf(invoiceId) {
   return (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM payments WHERE invoice_id=?').get(invoiceId)).s;
 }
+async function reliefOf(invoiceId) {
+  return (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM reliefs WHERE invoice_id=?').get(invoiceId)).s;
+}
 async function recognizedOf(invoiceId) {
   return (await db.prepare('SELECT COALESCE(SUM(nominal),0) s FROM revenue_recognition WHERE invoice_id=?').get(invoiceId)).s;
 }
+async function settleStatus(inv, settled) {
+  return settled >= inv.nominal ? 'lunas' : (settled > 0 ? 'sebagian' : 'terbit');
+}
 async function decorate(inv) {
-  const paid = await paidOf(inv.id), recognized = await recognizedOf(inv.id);
-  return { ...inv, paid, sisa: inv.nominal - paid, recognized, deferred: inv.nominal - recognized };
+  const paid = await paidOf(inv.id), relief = await reliefOf(inv.id), recognized = await recognizedOf(inv.id);
+  return { ...inv, paid, relief, recognized, sisa: inv.nominal - paid - relief, deferred: inv.nominal - recognized };
 }
 async function listInvoices(f = {}) {
   const params = []; let where = '1=1';
@@ -146,7 +152,10 @@ async function getInvoice(id) {
   const payments = await db.prepare(`SELECT p.*, j.nomor AS jurnal_nomor FROM payments p
     LEFT JOIN journals j ON j.id=p.journal_id WHERE p.invoice_id=? ORDER BY p.tanggal, p.id`).all(id);
   const recognitions = await db.prepare('SELECT * FROM revenue_recognition WHERE invoice_id=? ORDER BY tahun,bulan').all(id);
-  return { ...(await decorate(inv)), payments, recognitions };
+  const reliefs = await db.prepare(`SELECT r.*, a.kode AS akun_kode, a.nama AS akun_nama, j.nomor AS jurnal_nomor
+    FROM reliefs r JOIN accounts a ON a.id=r.account_id LEFT JOIN journals j ON j.id=r.journal_id
+    WHERE r.invoice_id=? ORDER BY r.tanggal, r.id`).all(id);
+  return { ...(await decorate(inv)), payments, recognitions, reliefs };
 }
 
 async function nextInvoiceNo(unitKode) {
@@ -228,7 +237,7 @@ const recordPayment = db.transaction(async (user, b) => {
   if (inv.status === 'void') throw new ApiError(409, 'Tagihan dibatalkan.');
   const nominal = toSen(b.nominal);
   if (nominal <= 0) throw new ApiError(400, 'Nominal pembayaran harus > 0.');
-  const sisa = inv.nominal - await paidOf(inv.id);
+  const sisa = inv.nominal - await paidOf(inv.id) - await reliefOf(inv.id);
   if (nominal > sisa) throw new ApiError(400, `Melebihi sisa tagihan (sisa Rp ${sisa / 100}).`);
 
   const ba = await db.prepare('SELECT * FROM bank_accounts WHERE id=?').get(b.bank_account_id);
@@ -245,10 +254,60 @@ const recordPayment = db.transaction(async (user, b) => {
   });
   const info = await db.prepare(`INSERT INTO payments (invoice_id,tanggal,nominal,metode,bank_account_id,journal_id) VALUES (?,?,?,?,?,?)`)
     .run(inv.id, b.tanggal, nominal, b.metode || 'transfer', ba.id, j.id);
-  const paid = await paidOf(inv.id);
-  const status = paid >= inv.nominal ? 'lunas' : 'sebagian';
-  await db.prepare('UPDATE invoices SET status=? WHERE id=?').run(status, inv.id);
+  const settled = await paidOf(inv.id) + await reliefOf(inv.id);
+  await db.prepare('UPDATE invoices SET status=? WHERE id=?').run(await settleStatus(inv, settled), inv.id);
   await audit.log(user, 'create', 'payment', info.lastInsertRowid, { invoice: inv.nomor, nominal }, user.ip);
+  return getInvoice(inv.id);
+});
+
+// ---------- Keringanan UKT (potongan & beasiswa) ----------
+const RELIEF_ACC = { potongan: '4150', beasiswa: '5350' };
+const RELIEF_LABEL = { potongan: 'Potongan/keringanan UKT', beasiswa: 'Beasiswa' };
+
+async function ensureReliefAccounts() {
+  const defs = [
+    ['4150', 'Potongan / Keringanan UKT', 'pendapatan', '4000', 'D', 1],
+    ['5350', 'Beban Beasiswa', 'beban', '5000', 'D', 0],
+  ];
+  for (const [kode, nama, tipe, parentKode, nb, kontra] of defs) {
+    if (await db.prepare('SELECT 1 FROM accounts WHERE kode=?').get(kode)) continue;
+    const parent = await db.prepare('SELECT id FROM accounts WHERE kode=?').get(parentKode);
+    await db.prepare(`INSERT INTO accounts (kode,nama,tipe,parent_id,is_postable,normal_balance,is_kontra)
+      VALUES (?,?,?,?,1,?,?) ON CONFLICT (kode) DO NOTHING`).run(kode, nama, tipe, parent ? parent.id : null, nb, kontra);
+  }
+}
+
+const recordRelief = db.transaction(async (user, b) => {
+  const inv = await db.prepare('SELECT * FROM invoices WHERE id=?').get(b.invoice_id);
+  if (!inv) throw new ApiError(404, 'Tagihan tidak ditemukan.');
+  if (inv.status === 'void') throw new ApiError(409, 'Tagihan dibatalkan.');
+  const jenis = b.jenis;
+  if (!RELIEF_ACC[jenis]) throw new ApiError(400, 'Jenis keringanan tidak valid (potongan/beasiswa).');
+  const nominal = toSen(b.nominal);
+  if (nominal <= 0) throw new ApiError(400, 'Nominal keringanan harus > 0.');
+  const sisa = inv.nominal - await paidOf(inv.id) - await reliefOf(inv.id);
+  if (nominal > sisa) throw new ApiError(400, `Melebihi sisa tagihan (sisa Rp ${sisa / 100}).`);
+
+  await ensureReliefAccounts();
+  const debitAcc = b.account_id
+    ? await db.prepare('SELECT * FROM accounts WHERE id=?').get(b.account_id)
+    : await accByKode(RELIEF_ACC[jenis]);
+  if (!debitAcc) throw new ApiError(400, 'Akun lawan tidak valid.');
+  const s = await db.prepare('SELECT * FROM students WHERE id=?').get(inv.student_id);
+
+  const j = await jsvc.createPosted(user, {
+    tanggal: b.tanggal, unit_id: inv.unit_id, sumber: 'keringanan', ip: user.ip, amountsInSen: true,
+    deskripsi: `${RELIEF_LABEL[jenis]} UKT ${inv.semester} — ${s.nama} (${inv.nomor})${b.keterangan ? ' · ' + b.keterangan : ''}`,
+    lines: [
+      { account_id: debitAcc.id, unit_id: inv.unit_id, debit: nominal, memo: inv.nomor },
+      { account_id: (await accByKode('1131')).id, unit_id: inv.unit_id, kredit: nominal, memo: RELIEF_LABEL[jenis] },
+    ],
+  });
+  const info = await db.prepare(`INSERT INTO reliefs (invoice_id,tanggal,jenis,nominal,account_id,keterangan,journal_id)
+    VALUES (?,?,?,?,?,?,?)`).run(inv.id, b.tanggal, jenis, nominal, debitAcc.id, b.keterangan || null, j.id);
+  const settled = await paidOf(inv.id) + await reliefOf(inv.id);
+  await db.prepare('UPDATE invoices SET status=? WHERE id=?').run(await settleStatus(inv, settled), inv.id);
+  await audit.log(user, 'create', 'relief', info.lastInsertRowid, { invoice: inv.nomor, jenis, nominal }, user.ip);
   return getInvoice(inv.id);
 });
 
@@ -265,7 +324,7 @@ async function aging(opts = {}) {
   const buckets = CKPN_BUCKETS.map(b => ({ key: b.key, label: b.label, rate: rates[b.key], outstanding: 0, ckpn: 0 }));
   const rows = [];
   for (const inv of invs) {
-    const sisa = inv.nominal - await paidOf(inv.id);
+    const sisa = inv.nominal - await paidOf(inv.id) - await reliefOf(inv.id);
     if (sisa <= 0) continue;
     const days = inv.jatuh_tempo ? daysBetween(inv.jatuh_tempo, asof) : 0;
     const b = bucketOf(days);
@@ -371,6 +430,6 @@ module.exports = {
   CKPN_BUCKETS, listCkpnRates, updateCkpnRate,
   listStudents, createStudent, updateStudent, importStudents,
   listInvoices, getInvoice, createInvoice, generateInvoices,
-  recordPayment, aging, ckpnBalance, runCkpn,
+  recordPayment, recordRelief, aging, ckpnBalance, runCkpn,
   amortisasiPreview, runAmortisasi,
 };

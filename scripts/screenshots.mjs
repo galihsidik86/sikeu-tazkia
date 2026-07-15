@@ -146,6 +146,12 @@ async function main() {
     await page.waitForSelector('#pyAmt', { timeout: 4000 }); await page.waitForTimeout(300);
   });
   await closeModalUI();
+  await capture('05-piutang-08-keringanan', async () => {
+    await goHash('/piutang/daftar');
+    await page.locator('[data-relief]').first().click();
+    await page.waitForSelector('#rlJenis', { timeout: 4000 }); await page.waitForTimeout(300);
+  });
+  await closeModalUI();
 
   // ============ 06 — PAJAK ============
   for (const [tab, idx, name] of [['pemotongan', 1, 'pemotongan'], ['rekap', 2, 'rekap-setor'], ['tarif', 3, 'tarif']]) {
